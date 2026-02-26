@@ -4,7 +4,8 @@ import { maintenanceItems, getVehicleById } from "@/data/mock-data";
 import { DataToolbar, FilterChipBar, InspectorPanel, PageHeader, StatusPill } from "@/components/product";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 const filters = ["all", "overdue", "scheduled", "completed"] as const;
 type MaintenanceFilter = (typeof filters)[number];
@@ -16,6 +17,7 @@ const tone = {
 } as const;
 
 export default function MaintenancePage() {
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [filter, setFilter] = useState<MaintenanceFilter>("all");
   const [search, setSearch] = useState("");
@@ -64,6 +66,23 @@ export default function MaintenancePage() {
 
   const selected = filtered.find((item) => item.id === selectedId) ?? filtered[0] ?? null;
   const selectedVehicle = selected ? getVehicleById(selected.vehicleId) : null;
+
+  const handleAssignBay = () => {
+    if (!selectedVehicle || !selected) return;
+    toast.success(`Bay assignment started for ${selectedVehicle.registration}`);
+    navigate(`/dispatch?vehicle=${selected.vehicleId}&maintenance=${selected.id}`);
+  };
+
+  const handleNotifyOps = () => {
+    if (!selectedVehicle || !selected) return;
+    toast.success(`Operations notified for ${selectedVehicle.registration}`);
+    navigate(`/alerts?vehicle=${selected.vehicleId}&maintenance=${selected.id}`);
+  };
+
+  const handleOpenFullHistory = () => {
+    if (!selected) return;
+    navigate(`/vehicles?vehicle=${selected.vehicleId}`);
+  };
 
   return (
     <div className="page-shell">
@@ -141,9 +160,9 @@ export default function MaintenancePage() {
             </div>
 
             <div className="grid grid-cols-2 gap-2">
-              <Button size="sm">Assign Bay</Button>
-              <Button size="sm" variant="outline">Notify Ops</Button>
-              <Button size="sm" variant="secondary" className="col-span-2">Open Full History</Button>
+              <Button size="sm" onClick={handleAssignBay}>Assign Bay</Button>
+              <Button size="sm" variant="outline" onClick={handleNotifyOps}>Notify Ops</Button>
+              <Button size="sm" variant="secondary" className="col-span-2" onClick={handleOpenFullHistory}>Open Full History</Button>
             </div>
           </InspectorPanel>
         ) : null}
