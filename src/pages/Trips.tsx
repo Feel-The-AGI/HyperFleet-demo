@@ -14,7 +14,8 @@ import {
 } from "@/components/product";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { toast } from "sonner";
 
 const statusOrder: Array<TripStatus | "all"> = ["all", "in_progress", "scheduled", "delayed", "completed"];
 
@@ -31,6 +32,7 @@ function prettyStatus(status: TripStatus | "all") {
 }
 
 export default function Trips() {
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [filter, setFilter] = useState<TripStatus | "all">("all");
   const [search, setSearch] = useState("");
@@ -112,6 +114,23 @@ export default function Trips() {
       },
     ];
   }, [selected]);
+
+  const handleAdjustEta = () => {
+    if (!selected) return;
+    toast.success(`ETA adjustment started for ${selected.id.toUpperCase()}`);
+    navigate(`/dispatch?trip=${selected.id}`);
+  };
+
+  const handleReroute = () => {
+    if (!selected) return;
+    toast.success(`Opening reroute view for ${selected.id.toUpperCase()}`);
+    navigate(`/fleet-map?vehicle=${selected.vehicleId}`);
+  };
+
+  const handleOpenDispatchTimeline = () => {
+    if (!selected) return;
+    navigate(`/dispatch?trip=${selected.id}`);
+  };
 
   return (
     <div className="page-shell">
@@ -226,15 +245,15 @@ export default function Trips() {
             </div>
 
             <div className="grid grid-cols-2 gap-2">
-              <Button size="sm" variant="outline">
+              <Button size="sm" variant="outline" onClick={handleAdjustEta}>
                 <Timer className="mr-1 h-3.5 w-3.5" />
                 Adjust ETA
               </Button>
-              <Button size="sm" variant="outline">
+              <Button size="sm" variant="outline" onClick={handleReroute}>
                 <Route className="mr-1 h-3.5 w-3.5" />
                 Reroute
               </Button>
-              <Button size="sm" className="col-span-2">
+              <Button size="sm" className="col-span-2" onClick={handleOpenDispatchTimeline}>
                 <Clock3 className="mr-1 h-3.5 w-3.5" />
                 Open Dispatch Timeline
               </Button>

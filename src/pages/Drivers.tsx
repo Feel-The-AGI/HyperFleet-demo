@@ -5,7 +5,8 @@ import { DataToolbar, FilterChipBar, InspectorPanel, PageHeader, StatusPill } fr
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { toast } from "sonner";
 
 const statusOrder = ["all", "valid", "expiring", "expired"] as const;
 
@@ -18,6 +19,7 @@ const statusTone = {
 } as const;
 
 export default function Drivers() {
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [filter, setFilter] = useState<LicenseFilter>("all");
   const [search, setSearch] = useState("");
@@ -66,6 +68,22 @@ export default function Drivers() {
 
   const selected = filtered.find((driver) => driver.id === selectedId) ?? filtered[0] ?? null;
   const selectedVehicle = selected?.assignedVehicle ? getVehicleById(selected.assignedVehicle) : null;
+
+  const handleOpenDriverWorkspace = () => {
+    if (!selected) return;
+
+    if (selected.activeTrip) {
+      navigate(`/trips?trip=${selected.activeTrip}`);
+      return;
+    }
+
+    if (selected.assignedVehicle) {
+      navigate(`/fleet-map?vehicle=${selected.assignedVehicle}`);
+      return;
+    }
+
+    toast.info("This driver has no active assignment yet.");
+  };
 
   return (
     <div className="page-shell">
@@ -165,7 +183,7 @@ export default function Drivers() {
               </div>
             ) : null}
 
-            <Button className="w-full">Open Driver Workspace</Button>
+            <Button className="w-full" onClick={handleOpenDriverWorkspace}>Open Driver Workspace</Button>
           </InspectorPanel>
         ) : null}
       </section>
