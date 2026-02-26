@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 120" role="img" aria-labelledby="truckTitle truckDesc">
+  <title id="truckTitle">Truck</title>
+  <desc id="truckDesc">Side view illustration of a heavy truck.</desc>
+  <rect x="3" y="3" width="254" height="114" rx="14" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+  <rect x="24" y="52" width="132" height="34" rx="7" fill="#2563eb"/>
+  <rect x="156" y="43" width="66" height="43" rx="7" fill="#0f172a"/>
+  <rect x="163" y="49" width="20" height="14" rx="3" fill="#93c5fd"/>
+  <rect x="188" y="49" width="20" height="14" rx="3" fill="#93c5fd"/>
+  <rect x="38" y="58" width="34" height="9" rx="2" fill="#bfdbfe"/>
+  <rect x="77" y="58" width="34" height="9" rx="2" fill="#bfdbfe"/>
+  <circle cx="68" cy="90" r="14" fill="#0f172a"/>
+  <circle cx="68" cy="90" r="6" fill="#94a3b8"/>
+  <circle cx="177" cy="90" r="14" fill="#0f172a"/>
+  <circle cx="177" cy="90" r="6" fill="#94a3b8"/>
+  <circle cx="213" cy="90" r="14" fill="#0f172a"/>
+  <circle cx="213" cy="90" r="6" fill="#94a3b8"/>
+</svg>
