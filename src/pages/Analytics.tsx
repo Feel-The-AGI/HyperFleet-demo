@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+﻿import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Download, BarChart3, Truck, Users, Fuel, Activity } from "lucide-react";
 import { toast } from "sonner";
@@ -13,7 +13,7 @@ const reports = [
 
 export default function Analytics() {
   return (
-    <div className="p-6 space-y-6">
+    <div className="page-shell p-6 space-y-6">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Reports & Analytics</h1>
         <p className="text-sm text-muted-foreground">Pre-built reports and fleet analytics</p>
@@ -39,3 +39,4 @@ export default function Analytics() {
     </div>
   );
 }
+

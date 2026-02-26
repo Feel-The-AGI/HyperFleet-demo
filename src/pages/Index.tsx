@@ -2,10 +2,10 @@
 
 const Index = () => {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
+    <div className="page-shell flex min-h-[calc(100vh-3.5rem)] items-center justify-center p-6">
+      <div className="panel-glass rounded-2xl border px-8 py-10 text-center max-w-xl">
+        <h1 className="mb-4 text-4xl font-bold tracking-tight">Welcome to HyperFleet</h1>
+        <p className="text-xl text-muted-foreground">Use the navigation to explore operations, management, intelligence, and reporting modules.</p>
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-import { Badge } from "@/components/ui/badge";
+﻿import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { trips, getDriverById, getVehicleById, type TripStatus } from "@/data/mock-data";
@@ -16,7 +16,7 @@ export default function Trips() {
   const filtered = filter === "all" ? trips : trips.filter(t => t.status === filter);
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="page-shell p-6 space-y-6">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Trip Management</h1>
         <p className="text-sm text-muted-foreground">{trips.length} trips across the fleet</p>
@@ -27,7 +27,7 @@ export default function Trips() {
           <button
             key={s}
             onClick={() => setFilter(s)}
-            className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${filter === s ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-accent"}`}
+            className={`glass-filter-pill ${filter === s ? "glass-filter-pill-active" : "glass-filter-pill-idle"}`}
           >
             {s === "all" ? "All" : s.replace("_", " ").replace(/\b\w/g, l => l.toUpperCase())} ({s === "all" ? trips.length : trips.filter(t => t.status === s).length})
           </button>
@@ -55,9 +55,9 @@ export default function Trips() {
               return (
                 <TableRow key={t.id} className="cursor-pointer hover:bg-muted/50">
                   <TableCell className="font-mono text-xs">{t.id.toUpperCase()}</TableCell>
-                  <TableCell className="text-sm">{t.origin} → {t.destination}</TableCell>
-                  <TableCell className="text-sm">{driver?.name ?? "—"}</TableCell>
-                  <TableCell className="font-mono text-xs">{vehicle?.registration ?? "—"}</TableCell>
+                  <TableCell className="text-sm">{t.origin} {"->"} {t.destination}</TableCell>
+                  <TableCell className="text-sm">{driver?.name ?? "--"}</TableCell>
+                  <TableCell className="font-mono text-xs">{vehicle?.registration ?? "--"}</TableCell>
                   <TableCell><Badge className={`text-[10px] ${statusBadge[t.status]}`}>{t.status.replace("_", " ")}</Badge></TableCell>
                   <TableCell className="text-sm">{t.eta}</TableCell>
                   <TableCell>
@@ -76,3 +76,4 @@ export default function Trips() {
     </div>
   );
 }
+

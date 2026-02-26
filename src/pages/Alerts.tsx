@@ -1,4 +1,4 @@
-import { Badge } from "@/components/ui/badge";
+﻿import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { alerts, type AlertUrgency } from "@/data/mock-data";
 import { CheckCircle } from "lucide-react";
@@ -11,7 +11,7 @@ const urgencyColors: Record<AlertUrgency, string> = {
 
 export default function AlertsPage() {
   return (
-    <div className="p-6 space-y-6">
+    <div className="page-shell p-6 space-y-6">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Alert Center</h1>
         <p className="text-sm text-muted-foreground">{alerts.filter(a => !a.acknowledged).length} unacknowledged alerts</p>
@@ -39,3 +39,4 @@ export default function AlertsPage() {
     </div>
   );
 }
+

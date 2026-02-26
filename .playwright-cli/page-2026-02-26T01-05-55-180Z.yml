@@ -1,0 +1,311 @@
+- generic [ref=e2]:
+  - region "Notifications (F8)":
+    - list
+  - region "Notifications alt+T"
+  - generic [ref=e4]:
+    - generic [ref=e8]:
+      - generic [ref=e9]:
+        - img [ref=e10]
+        - generic [ref=e12]: HyperFleet
+      - generic [ref=e13]:
+        - generic [ref=e14]:
+          - generic [ref=e15]: Operations
+          - list [ref=e17]:
+            - listitem [ref=e18]:
+              - link "Dashboard" [ref=e19] [cursor=pointer]:
+                - /url: /
+                - img [ref=e20]
+                - generic [ref=e25]: Dashboard
+            - listitem [ref=e26]:
+              - link "Fleet Map" [ref=e27] [cursor=pointer]:
+                - /url: /fleet-map
+                - img [ref=e28]
+                - generic [ref=e30]: Fleet Map
+            - listitem [ref=e31]:
+              - link "Trips" [ref=e32] [cursor=pointer]:
+                - /url: /trips
+                - img [ref=e33]
+                - generic [ref=e35]: Trips
+            - listitem [ref=e36]:
+              - link "Dispatch Board" [ref=e37] [cursor=pointer]:
+                - /url: /dispatch
+                - img [ref=e38]
+                - generic [ref=e40]: Dispatch Board
+        - generic [ref=e41]:
+          - generic [ref=e42]: Management
+          - list [ref=e44]:
+            - listitem [ref=e45]:
+              - link "Vehicles" [ref=e46] [cursor=pointer]:
+                - /url: /vehicles
+                - img [ref=e47]
+                - generic [ref=e52]: Vehicles
+            - listitem [ref=e53]:
+              - link "Drivers" [ref=e54] [cursor=pointer]:
+                - /url: /drivers
+                - img [ref=e55]
+                - generic [ref=e60]: Drivers
+            - listitem [ref=e61]:
+              - link "Fuel" [ref=e62] [cursor=pointer]:
+                - /url: /fuel
+                - img [ref=e63]
+                - generic [ref=e66]: Fuel
+            - listitem [ref=e67]:
+              - link "Maintenance" [ref=e68] [cursor=pointer]:
+                - /url: /maintenance
+                - img [ref=e69]
+                - generic [ref=e71]: Maintenance
+        - generic [ref=e72]:
+          - generic [ref=e73]: Intelligence
+          - list [ref=e75]:
+            - listitem [ref=e76]:
+              - link "AI Insights" [ref=e77] [cursor=pointer]:
+                - /url: /ai-insights
+                - img [ref=e78]
+                - generic [ref=e88]: AI Insights
+            - listitem [ref=e89]:
+              - link "Agent Queue" [ref=e90] [cursor=pointer]:
+                - /url: /agent-queue
+                - img [ref=e91]
+                - generic [ref=e94]: Agent Queue
+            - listitem [ref=e95]:
+              - link "Alerts" [ref=e96] [cursor=pointer]:
+                - /url: /alerts
+                - img [ref=e97]
+                - generic [ref=e99]: Alerts
+        - generic [ref=e100]:
+          - generic [ref=e101]: Reports
+          - list [ref=e103]:
+            - listitem [ref=e104]:
+              - link "Analytics" [ref=e105] [cursor=pointer]:
+                - /url: /analytics
+                - img [ref=e106]
+                - generic [ref=e108]: Analytics
+            - listitem [ref=e109]:
+              - link "Compliance" [ref=e110] [cursor=pointer]:
+                - /url: /compliance
+                - img [ref=e111]
+                - generic [ref=e115]: Compliance
+            - listitem [ref=e116]:
+              - link "Cost Breakdown" [ref=e117] [cursor=pointer]:
+                - /url: /costs
+                - img [ref=e118]
+                - generic [ref=e120]: Cost Breakdown
+    - generic [ref=e121]:
+      - banner [ref=e122]:
+        - generic [ref=e123]:
+          - button "Toggle Sidebar" [ref=e124] [cursor=pointer]:
+            - img
+            - generic [ref=e125]: Toggle Sidebar
+          - generic [ref=e126]:
+            - img [ref=e127]
+            - generic [ref=e130]: Search fleet...
+        - generic [ref=e131]:
+          - generic [ref=e132]:
+            - img [ref=e133]
+            - generic [ref=e136]: "6"
+          - generic [ref=e137]: FM
+      - main [ref=e138]:
+        - generic [ref=e139]:
+          - generic [ref=e140]:
+            - heading "Trip Management" [level=1] [ref=e141]
+            - paragraph [ref=e142]: 14 trips across the fleet
+          - generic [ref=e143]:
+            - button "All (14)" [ref=e144] [cursor=pointer]
+            - button "In Progress (9)" [ref=e145] [cursor=pointer]
+            - button "Scheduled (2)" [ref=e146] [cursor=pointer]
+            - button "Completed (2)" [ref=e147] [cursor=pointer]
+            - button "Delayed (1)" [ref=e148] [cursor=pointer]
+          - table [ref=e151]:
+            - rowgroup [ref=e152]:
+              - row "Trip ID Route Driver Vehicle Status ETA Progress Cargo" [ref=e153]:
+                - columnheader "Trip ID" [ref=e154]
+                - columnheader "Route" [ref=e155]
+                - columnheader "Driver" [ref=e156]
+                - columnheader "Vehicle" [ref=e157]
+                - columnheader "Status" [ref=e158]
+                - columnheader "ETA" [ref=e159]
+                - columnheader "Progress" [ref=e160]
+                - columnheader "Cargo" [ref=e161]
+            - rowgroup [ref=e162]:
+              - row "T1 Accra -> Kumasi Kwame Asante GR-2841-24 in progress 14:30 62% Electronics" [ref=e163] [cursor=pointer]:
+                - cell "T1" [ref=e164]
+                - cell "Accra -> Kumasi" [ref=e165]
+                - cell "Kwame Asante" [ref=e166]
+                - cell "GR-2841-24" [ref=e167]
+                - cell "in progress" [ref=e168]:
+                  - generic [ref=e169]: in progress
+                - cell "14:30" [ref=e170]
+                - cell "62%" [ref=e171]:
+                  - generic [ref=e172]:
+                    - progressbar [ref=e173]
+                    - generic [ref=e175]: 62%
+                - cell "Electronics" [ref=e176]
+              - row "T2 Tema -> Lomé Kofi Mensah GR-1193-23 in progress 16:00 45% Textiles" [ref=e177] [cursor=pointer]:
+                - cell "T2" [ref=e178]
+                - cell "Tema -> Lomé" [ref=e179]
+                - cell "Kofi Mensah" [ref=e180]
+                - cell "GR-1193-23" [ref=e181]
+                - cell "in progress" [ref=e182]:
+                  - generic [ref=e183]: in progress
+                - cell "16:00" [ref=e184]
+                - cell "45%" [ref=e185]:
+                  - generic [ref=e186]:
+                    - progressbar [ref=e187]
+                    - generic [ref=e189]: 45%
+                - cell "Textiles" [ref=e190]
+              - row "T3 Accra -> Lomé Yaw Boateng GR-8891-24 in progress 13:45 78% Pharmaceuticals" [ref=e191] [cursor=pointer]:
+                - cell "T3" [ref=e192]
+                - cell "Accra -> Lomé" [ref=e193]
+                - cell "Yaw Boateng" [ref=e194]
+                - cell "GR-8891-24" [ref=e195]
+                - cell "in progress" [ref=e196]:
+                  - generic [ref=e197]: in progress
+                - cell "13:45" [ref=e198]
+                - cell "78%" [ref=e199]:
+                  - generic [ref=e200]:
+                    - progressbar [ref=e201]
+                    - generic [ref=e203]: 78%
+                - cell "Pharmaceuticals" [ref=e204]
+              - row "T4 Lomé -> Cotonou Akosua Darko GR-4456-22 in progress 12:00 88% Building Materials" [ref=e205] [cursor=pointer]:
+                - cell "T4" [ref=e206]
+                - cell "Lomé -> Cotonou" [ref=e207]
+                - cell "Akosua Darko" [ref=e208]
+                - cell "GR-4456-22" [ref=e209]
+                - cell "in progress" [ref=e210]:
+                  - generic [ref=e211]: in progress
+                - cell "12:00" [ref=e212]
+                - cell "88%" [ref=e213]:
+                  - generic [ref=e214]:
+                    - progressbar [ref=e215]
+                    - generic [ref=e217]: 88%
+                - cell "Building Materials" [ref=e218]
+              - row "T5 Kumasi -> Sunyani Abena Frimpong GR-2205-24 in progress 11:30 55% Agricultural Products" [ref=e219] [cursor=pointer]:
+                - cell "T5" [ref=e220]
+                - cell "Kumasi -> Sunyani" [ref=e221]
+                - cell "Abena Frimpong" [ref=e222]
+                - cell "GR-2205-24" [ref=e223]
+                - cell "in progress" [ref=e224]:
+                  - generic [ref=e225]: in progress
+                - cell "11:30" [ref=e226]
+                - cell "55%" [ref=e227]:
+                  - generic [ref=e228]:
+                    - progressbar [ref=e229]
+                    - generic [ref=e231]: 55%
+                - cell "Agricultural Products" [ref=e232]
+              - row "T6 Tema -> Lagos Issah Mohammed GR-1147-24 in progress 22:00 35% Auto Parts" [ref=e233] [cursor=pointer]:
+                - cell "T6" [ref=e234]
+                - cell "Tema -> Lagos" [ref=e235]
+                - cell "Issah Mohammed" [ref=e236]
+                - cell "GR-1147-24" [ref=e237]
+                - cell "in progress" [ref=e238]:
+                  - generic [ref=e239]: in progress
+                - cell "22:00" [ref=e240]
+                - cell "35%" [ref=e241]:
+                  - generic [ref=e242]:
+                    - progressbar [ref=e243]
+                    - generic [ref=e245]: 35%
+                - cell "Auto Parts" [ref=e246]
+              - row "T7 Tema Port -> Accra Warehouse Samuel Owusu GR-5504-24 in progress 10:30 90% Container Cargo" [ref=e247] [cursor=pointer]:
+                - cell "T7" [ref=e248]
+                - cell "Tema Port -> Accra Warehouse" [ref=e249]
+                - cell "Samuel Owusu" [ref=e250]
+                - cell "GR-5504-24" [ref=e251]
+                - cell "in progress" [ref=e252]:
+                  - generic [ref=e253]: in progress
+                - cell "10:30" [ref=e254]
+                - cell "90%" [ref=e255]:
+                  - generic [ref=e256]:
+                    - progressbar [ref=e257]
+                    - generic [ref=e259]: 90%
+                - cell "Container Cargo" [ref=e260]
+              - row "T8 Kumasi -> Accra Patience Adjei GR-2276-24 in progress 15:00 40% Cocoa Products" [ref=e261] [cursor=pointer]:
+                - cell "T8" [ref=e262]
+                - cell "Kumasi -> Accra" [ref=e263]
+                - cell "Patience Adjei" [ref=e264]
+                - cell "GR-2276-24" [ref=e265]
+                - cell "in progress" [ref=e266]:
+                  - generic [ref=e267]: in progress
+                - cell "15:00" [ref=e268]
+                - cell "40%" [ref=e269]:
+                  - generic [ref=e270]:
+                    - progressbar [ref=e271]
+                    - generic [ref=e273]: 40%
+                - cell "Cocoa Products" [ref=e274]
+              - row "T9 Accra -> Lomé Francis Kumi GR-6617-24 delayed 14:00 70% Fuel Products" [ref=e275] [cursor=pointer]:
+                - cell "T9" [ref=e276]
+                - cell "Accra -> Lomé" [ref=e277]
+                - cell "Francis Kumi" [ref=e278]
+                - cell "GR-6617-24" [ref=e279]
+                - cell "delayed" [ref=e280]:
+                  - generic [ref=e281]: delayed
+                - cell "14:00" [ref=e282]
+                - cell "70%" [ref=e283]:
+                  - generic [ref=e284]:
+                    - progressbar [ref=e285]
+                    - generic [ref=e287]: 70%
+                - cell "Fuel Products" [ref=e288]
+              - row "T10 Tema -> Kumasi Daniel Quaye GR-1150-24 in progress 16:30 25% FMCG" [ref=e289] [cursor=pointer]:
+                - cell "T10" [ref=e290]
+                - cell "Tema -> Kumasi" [ref=e291]
+                - cell "Daniel Quaye" [ref=e292]
+                - cell "GR-1150-24" [ref=e293]
+                - cell "in progress" [ref=e294]:
+                  - generic [ref=e295]: in progress
+                - cell "16:30" [ref=e296]
+                - cell "25%" [ref=e297]:
+                  - generic [ref=e298]:
+                    - progressbar [ref=e299]
+                    - generic [ref=e301]: 25%
+                - cell "FMCG" [ref=e302]
+              - row "T11 Accra -> Cape Coast Kwame Asante GR-2841-24 completed — 100% Cement" [ref=e303] [cursor=pointer]:
+                - cell "T11" [ref=e304]
+                - cell "Accra -> Cape Coast" [ref=e305]
+                - cell "Kwame Asante" [ref=e306]
+                - cell "GR-2841-24" [ref=e307]
+                - cell "completed" [ref=e308]:
+                  - generic [ref=e309]: completed
+                - cell "—" [ref=e310]
+                - cell "100%" [ref=e311]:
+                  - generic [ref=e312]:
+                    - progressbar [ref=e313]
+                    - generic [ref=e315]: 100%
+                - cell "Cement" [ref=e316]
+              - row "T12 Cotonou -> Lagos Akosua Darko GR-4456-22 completed — 100% Rice" [ref=e317] [cursor=pointer]:
+                - cell "T12" [ref=e318]
+                - cell "Cotonou -> Lagos" [ref=e319]
+                - cell "Akosua Darko" [ref=e320]
+                - cell "GR-4456-22" [ref=e321]
+                - cell "completed" [ref=e322]:
+                  - generic [ref=e323]: completed
+                - cell "—" [ref=e324]
+                - cell "100%" [ref=e325]:
+                  - generic [ref=e326]:
+                    - progressbar [ref=e327]
+                    - generic [ref=e329]: 100%
+                - cell "Rice" [ref=e330]
+              - row "T13 Kumasi -> Tamale Abena Frimpong GR-2205-24 scheduled — 0% Steel" [ref=e331] [cursor=pointer]:
+                - cell "T13" [ref=e332]
+                - cell "Kumasi -> Tamale" [ref=e333]
+                - cell "Abena Frimpong" [ref=e334]
+                - cell "GR-2205-24" [ref=e335]
+                - cell "scheduled" [ref=e336]:
+                  - generic [ref=e337]: scheduled
+                - cell "—" [ref=e338]
+                - cell "0%" [ref=e339]:
+                  - generic [ref=e340]:
+                    - progressbar [ref=e341]
+                    - generic [ref=e343]: 0%
+                - cell "Steel" [ref=e344]
+              - row "T14 Accra -> Takoradi Ama Osei GR-5527-24 scheduled — 0% Machinery" [ref=e345] [cursor=pointer]:
+                - cell "T14" [ref=e346]
+                - cell "Accra -> Takoradi" [ref=e347]
+                - cell "Ama Osei" [ref=e348]
+                - cell "GR-5527-24" [ref=e349]
+                - cell "scheduled" [ref=e350]:
+                  - generic [ref=e351]: scheduled
+                - cell "—" [ref=e352]
+                - cell "0%" [ref=e353]:
+                  - generic [ref=e354]:
+                    - progressbar [ref=e355]
+                    - generic [ref=e357]: 0%
+                - cell "Machinery" [ref=e358]

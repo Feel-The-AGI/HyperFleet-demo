@@ -1,4 +1,4 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+﻿import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -18,9 +18,9 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, LineChart, Line, Responsive
 const stats = getFleetStats();
 
 const kpiCards = [
-  { label: "Total Vehicles", value: stats.total, sub: `${stats.active} active · ${stats.idle} idle · ${stats.offline} offline`, icon: Truck, color: "text-fleet-info" },
+  { label: "Total Vehicles", value: stats.total, sub: `${stats.active} active Â· ${stats.idle} idle Â· ${stats.offline} offline`, icon: Truck, color: "text-fleet-info" },
   { label: "Active Trips", value: stats.activeTrips, sub: "In progress now", icon: Navigation, color: "text-fleet-success" },
-  { label: "Fuel Spend (GHS)", value: `₵${stats.totalFuelCostGHS.toLocaleString()}`, sub: "This week", icon: Fuel, color: "text-fleet-warning" },
+  { label: "Fuel Spend (GHS)", value: `â‚µ${stats.totalFuelCostGHS.toLocaleString()}`, sub: "This week", icon: Fuel, color: "text-fleet-warning" },
   { label: "Pending Alerts", value: stats.pendingAlerts, sub: "Unacknowledged", icon: AlertTriangle, color: "text-fleet-danger" },
   { label: "Fleet Health", value: `${stats.avgHealthScore}%`, sub: "Average score", icon: Activity, color: "text-fleet-info" },
 ];
@@ -90,11 +90,11 @@ function EventItem({ e }: { e: ActivityEvent }) {
 
 export default function Dashboard() {
   return (
-    <div className="p-6 space-y-6">
+    <div className="page-shell p-6 space-y-6">
       {/* Page header */}
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Operations Dashboard</h1>
-        <p className="text-sm text-muted-foreground">Real-time fleet overview — {new Date().toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}</p>
+        <p className="text-sm text-muted-foreground">Real-time fleet overview â€” {new Date().toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}</p>
       </div>
 
       {/* KPI Cards */}
@@ -186,3 +186,4 @@ export default function Dashboard() {
     </div>
   );
 }
+

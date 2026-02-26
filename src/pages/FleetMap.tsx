@@ -196,182 +196,195 @@ export default function FleetMap() {
   };
 
   return (
-    <div className="flex h-[calc(100vh-3.5rem)] flex-col">
-      <div className="flex items-center justify-between gap-3 border-b bg-card px-4 py-2 shrink-0">
-        <div className="flex items-center gap-2 overflow-x-auto">
-          {(["all", "moving", "idle", "stopped", "offline"] as const).map((statusKey) => (
-            <button
-              key={statusKey}
-              onClick={() => {
-                setFilter(statusKey);
-                const target =
-                  statusKey === "all"
-                    ? liveVehicles
-                    : liveVehicles.filter((vehicle) => vehicle.status === statusKey);
-                requestMapFit(target);
-              }}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-                filter === statusKey
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-muted text-muted-foreground hover:bg-accent"
-              }`}
-            >
-              {statusKey !== "all" && <span className={`h-2 w-2 rounded-full ${statusDotColors[statusKey]}`} />}
-              <span className="capitalize">{statusKey}</span>
-              <span className="ml-1 text-[10px]">({counts[statusKey]})</span>
-            </button>
-          ))}
-        </div>
+    <div className="liquid-shell relative h-[calc(100vh-3.5rem)] overflow-hidden p-3 sm:p-4">
+      <div className="liquid-orb liquid-orb-one" aria-hidden="true" />
+      <div className="liquid-orb liquid-orb-two" aria-hidden="true" />
+      <div className="liquid-orb liquid-orb-three" aria-hidden="true" />
 
-        <div className="flex items-center gap-3 shrink-0">
-          <div className="hidden md:flex items-center gap-2 text-xs text-muted-foreground">
-            <span className="relative flex h-2.5 w-2.5">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-fleet-success opacity-75" />
-              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-fleet-success" />
-            </span>
-            <span>Streaming live</span>
-            <span className="text-[11px] text-muted-foreground/80">
-              {lastStreamAt.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", second: "2-digit" })}
-            </span>
-          </div>
-          <Button size="sm" className="h-8 gap-1.5" onClick={() => requestMapFit(filteredVehicles)}>
-            <Radar className="h-3.5 w-3.5" />
-            View Interactive Map
-          </Button>
-        </div>
-      </div>
-
-      <div className="flex-1 flex relative min-h-0">
-        <div className="flex-1 min-h-0">
-          <MapContainer center={[6.2, 0.2]} zoom={7} minZoom={5} maxZoom={14} scrollWheelZoom className="h-full w-full z-0">
-            <TileLayer
-              url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
-              attribution="&copy; OpenStreetMap contributors &copy; CARTO"
-            />
-
-            <FitToMarkers positions={fitPositions} fitToken={fitToken} />
-            <FocusOnSelected vehicle={selected} />
-
-            {filteredVehicles.map((vehicle) => (
-              <Marker
-                key={vehicle.id}
-                position={[vehicle.lastLocation.lat, vehicle.lastLocation.lng]}
-                icon={createMarkerIcon(vehicle)}
-                eventHandlers={{ click: () => setSelectedId(vehicle.id) }}
+      <div className="relative z-10 flex h-full min-h-0 flex-col gap-3">
+        <div className="liquid-glass-panel flex items-center justify-between gap-3 px-3 py-2 sm:px-4 sm:py-3 shrink-0">
+          <div className="flex items-center gap-2 overflow-x-auto">
+            {(["all", "moving", "idle", "stopped", "offline"] as const).map((statusKey) => (
+              <button
+                key={statusKey}
+                aria-pressed={filter === statusKey}
+                onClick={() => {
+                  setFilter(statusKey);
+                  const target =
+                    statusKey === "all"
+                      ? liveVehicles
+                      : liveVehicles.filter((vehicle) => vehicle.status === statusKey);
+                  requestMapFit(target);
+                }}
+                className={`liquid-filter-pill ${
+                  filter === statusKey ? "liquid-filter-pill-active" : "liquid-filter-pill-idle"
+                }`}
               >
-                <Popup>
-                  <div className="min-w-[220px] space-y-2">
-                    <div className="flex items-center gap-2">
-                      <img
-                        src={vehicleImageByType(vehicle.type)}
-                        alt={`${vehicle.type} vehicle`}
-                        className="h-10 w-16 rounded-md border bg-muted/40 object-contain p-1"
-                      />
-                      <div>
-                        <p className="text-sm font-semibold">{vehicle.registration}</p>
-                        <p className="text-xs text-muted-foreground">{vehicle.make} {vehicle.model}</p>
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
-                      <p>Status: <span className="font-medium">{statusLabels[vehicle.status]}</span></p>
-                      <p>Speed: <span className="font-medium">{vehicle.speed} km/h</span></p>
-                      <p>Fuel: <span className="font-medium">{vehicle.fuelLevel}%</span></p>
-                      <p>Health: <span className="font-medium">{vehicle.healthScore}/100</span></p>
-                    </div>
-                    <p className="text-xs text-muted-foreground">
-                      {vehicle.lastLocation.label} ({vehicle.lastLocation.lat.toFixed(4)}, {vehicle.lastLocation.lng.toFixed(4)})
-                    </p>
-                  </div>
-                </Popup>
-              </Marker>
-            ))}
-          </MapContainer>
-        </div>
-
-        {selected && (
-          <div className="absolute md:static right-0 top-0 bottom-0 z-[500] w-[22rem] max-w-[94vw] border-l bg-card overflow-auto shrink-0">
-            <div className="p-4 border-b flex items-center justify-between">
-              <h3 className="font-semibold text-sm">{selected.registration}</h3>
-              <button onClick={() => setSelectedId(null)} className="text-muted-foreground hover:text-foreground">
-                <X className="h-4 w-4" />
+                {statusKey !== "all" && <span className={`h-2 w-2 rounded-full ${statusDotColors[statusKey]}`} />}
+                <span className="capitalize">{statusKey}</span>
+                <span className="ml-1 text-[10px]">({counts[statusKey]})</span>
               </button>
+            ))}
+          </div>
+
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+            <div className="hidden md:flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-xs text-slate-100">
+              <span className="relative flex h-2.5 w-2.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-fleet-success opacity-75" />
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-fleet-success" />
+              </span>
+              <span>Streaming live</span>
+              <span className="text-[11px] text-slate-200/90">
+                {lastStreamAt.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", second: "2-digit" })}
+              </span>
             </div>
 
-            <div className="p-4 space-y-4">
-              <img
-                src={vehicleImageByType(selected.type)}
-                alt={`${selected.type} image`}
-                className="h-28 w-full rounded-lg border bg-muted/40 object-contain p-2"
+            <Button size="sm" className="liquid-action-btn h-8 gap-1.5" onClick={() => requestMapFit(filteredVehicles)}>
+              <Radar className="h-3.5 w-3.5" />
+              View Interactive Map
+            </Button>
+          </div>
+        </div>
+
+        <div className="liquid-map-frame flex-1 flex relative min-h-0 overflow-hidden">
+          <div className="flex-1 min-h-0">
+            <MapContainer
+              center={[6.2, 0.2]}
+              zoom={7}
+              minZoom={5}
+              maxZoom={14}
+              scrollWheelZoom
+              className="liquid-map-surface h-full w-full z-0"
+            >
+              <TileLayer
+                url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+                attribution="&copy; OpenStreetMap contributors &copy; CARTO"
               />
 
-              <div className="flex items-center justify-between gap-2">
-                <Badge className={statusBadge[selected.status]}>{statusLabels[selected.status]}</Badge>
-                <span className="text-xs text-muted-foreground">{selected.type}</span>
-              </div>
+              <FitToMarkers positions={fitPositions} fitToken={fitToken} />
+              <FocusOnSelected vehicle={selected} />
 
-              <div>
-                <p className="text-sm font-medium">{selected.make} {selected.model}</p>
-                <p className="text-xs text-muted-foreground">Year {selected.year} | Odometer {selected.odometer.toLocaleString()} km</p>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1">
-                  <div className="flex items-center gap-1 text-[10px] text-muted-foreground"><Gauge className="h-3 w-3" /> Speed</div>
-                  <p className="text-sm font-semibold">{selected.speed} km/h</p>
-                </div>
-                <div className="space-y-1">
-                  <div className="flex items-center gap-1 text-[10px] text-muted-foreground"><Navigation className="h-3 w-3" /> Heading</div>
-                  <p className="text-sm font-semibold">{selected.heading} deg</p>
-                </div>
-                <div className="space-y-1">
-                  <div className="flex items-center gap-1 text-[10px] text-muted-foreground"><FuelIcon className="h-3 w-3" /> Fuel</div>
-                  <p className="text-sm font-semibold">{selected.fuelLevel}%</p>
-                </div>
-                <div className="space-y-1">
-                  <div className="flex items-center gap-1 text-[10px] text-muted-foreground"><ShieldCheck className="h-3 w-3" /> Health</div>
-                  <p className="text-sm font-semibold">{selected.healthScore}/100</p>
-                </div>
-              </div>
-
-              <div className="border-t pt-3 space-y-2">
-                <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Live location</p>
-                <p className="text-sm">{selected.lastLocation.label}</p>
-                <p className="text-[11px] text-muted-foreground">
-                  {selected.lastLocation.lat.toFixed(5)}, {selected.lastLocation.lng.toFixed(5)}
-                </p>
-              </div>
-
-              <div className="border-t pt-3 space-y-1">
-                <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Telemetry stream</p>
-                <p className="text-xs text-muted-foreground flex items-center gap-1.5">
-                  <Clock3 className="h-3 w-3" />
-                  Last update {lastStreamAt.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", second: "2-digit" })}
-                </p>
-              </div>
-
-              {driver ? (
-                <div className="border-t pt-3">
-                  <p className="text-[10px] uppercase tracking-wide text-muted-foreground mb-2">Assigned driver</p>
-                  <div className="flex items-center gap-2">
-                    <div className="h-9 w-9 rounded-full bg-primary flex items-center justify-center text-xs font-medium text-primary-foreground">{driver.avatar}</div>
-                    <div className="min-w-0">
-                      <p className="text-sm font-medium">{driver.name}</p>
-                      <p className="text-[11px] text-muted-foreground">{driver.phone}</p>
+              {filteredVehicles.map((vehicle) => (
+                <Marker
+                  key={vehicle.id}
+                  position={[vehicle.lastLocation.lat, vehicle.lastLocation.lng]}
+                  icon={createMarkerIcon(vehicle)}
+                  eventHandlers={{ click: () => setSelectedId(vehicle.id) }}
+                >
+                  <Popup>
+                    <div className="min-w-[220px] space-y-2">
+                      <div className="flex items-center gap-2">
+                        <img
+                          src={vehicleImageByType(vehicle.type)}
+                          alt={`${vehicle.type} vehicle`}
+                          className="h-10 w-16 rounded-md border border-white/40 bg-white/50 object-contain p-1"
+                        />
+                        <div>
+                          <p className="text-sm font-semibold text-slate-900">{vehicle.registration}</p>
+                          <p className="text-xs text-slate-600">{vehicle.make} {vehicle.model}</p>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-slate-800">
+                        <p>Status: <span className="font-medium">{statusLabels[vehicle.status]}</span></p>
+                        <p>Speed: <span className="font-medium">{vehicle.speed} km/h</span></p>
+                        <p>Fuel: <span className="font-medium">{vehicle.fuelLevel}%</span></p>
+                        <p>Health: <span className="font-medium">{vehicle.healthScore}/100</span></p>
+                      </div>
+                      <p className="text-xs text-slate-600">
+                        {vehicle.lastLocation.label} ({vehicle.lastLocation.lat.toFixed(4)}, {vehicle.lastLocation.lng.toFixed(4)})
+                      </p>
                     </div>
-                  </div>
-                  <p className="text-[11px] text-muted-foreground mt-2">Behavior score: {driver.behaviorScore}/100</p>
-                </div>
-              ) : (
-                <div className="border-t pt-3 text-xs text-muted-foreground">No driver assigned.</div>
-              )}
+                  </Popup>
+                </Marker>
+              ))}
+            </MapContainer>
+          </div>
 
-              <div className="border-t pt-3 text-xs text-muted-foreground flex items-center gap-1.5">
-                <Route className="h-3.5 w-3.5" />
-                Marker remains clickable on map for continuous tracking.
+          {selected && (
+            <div className="liquid-detail-panel absolute md:static right-2 top-2 bottom-2 z-[500] w-[22rem] max-w-[94vw] overflow-auto shrink-0">
+              <div className="p-4 border-b border-white/20 flex items-center justify-between">
+                <h3 className="font-semibold text-sm text-slate-100">{selected.registration}</h3>
+                <button onClick={() => setSelectedId(null)} className="text-slate-300 hover:text-white">
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+
+              <div className="p-4 space-y-4">
+                <img
+                  src={vehicleImageByType(selected.type)}
+                  alt={`${selected.type} image`}
+                  className="h-28 w-full rounded-xl border border-white/20 bg-white/10 object-contain p-2"
+                />
+
+                <div className="flex items-center justify-between gap-2">
+                  <Badge className={statusBadge[selected.status]}>{statusLabels[selected.status]}</Badge>
+                  <span className="text-xs text-slate-200">{selected.type}</span>
+                </div>
+
+                <div>
+                  <p className="text-sm font-medium text-slate-100">{selected.make} {selected.model}</p>
+                  <p className="text-xs text-slate-300">Year {selected.year} | Odometer {selected.odometer.toLocaleString()} km</p>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-1 text-[10px] text-slate-300"><Gauge className="h-3 w-3" /> Speed</div>
+                    <p className="text-sm font-semibold text-white">{selected.speed} km/h</p>
+                  </div>
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-1 text-[10px] text-slate-300"><Navigation className="h-3 w-3" /> Heading</div>
+                    <p className="text-sm font-semibold text-white">{selected.heading} deg</p>
+                  </div>
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-1 text-[10px] text-slate-300"><FuelIcon className="h-3 w-3" /> Fuel</div>
+                    <p className="text-sm font-semibold text-white">{selected.fuelLevel}%</p>
+                  </div>
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-1 text-[10px] text-slate-300"><ShieldCheck className="h-3 w-3" /> Health</div>
+                    <p className="text-sm font-semibold text-white">{selected.healthScore}/100</p>
+                  </div>
+                </div>
+
+                <div className="border-t border-white/20 pt-3 space-y-2">
+                  <p className="text-[10px] uppercase tracking-wide text-slate-300">Live location</p>
+                  <p className="text-sm text-slate-100">{selected.lastLocation.label}</p>
+                  <p className="text-[11px] text-slate-300">
+                    {selected.lastLocation.lat.toFixed(5)}, {selected.lastLocation.lng.toFixed(5)}
+                  </p>
+                </div>
+
+                <div className="border-t border-white/20 pt-3 space-y-1">
+                  <p className="text-[10px] uppercase tracking-wide text-slate-300">Telemetry stream</p>
+                  <p className="text-xs text-slate-300 flex items-center gap-1.5">
+                    <Clock3 className="h-3 w-3" />
+                    Last update {lastStreamAt.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", second: "2-digit" })}
+                  </p>
+                </div>
+
+                {driver ? (
+                  <div className="border-t border-white/20 pt-3">
+                    <p className="text-[10px] uppercase tracking-wide text-slate-300 mb-2">Assigned driver</p>
+                    <div className="flex items-center gap-2">
+                      <div className="h-9 w-9 rounded-full bg-white/20 border border-white/30 flex items-center justify-center text-xs font-medium text-white">{driver.avatar}</div>
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-slate-100">{driver.name}</p>
+                        <p className="text-[11px] text-slate-300">{driver.phone}</p>
+                      </div>
+                    </div>
+                    <p className="text-[11px] text-slate-300 mt-2">Behavior score: {driver.behaviorScore}/100</p>
+                  </div>
+                ) : (
+                  <div className="border-t border-white/20 pt-3 text-xs text-slate-300">No driver assigned.</div>
+                )}
+
+                <div className="border-t border-white/20 pt-3 text-xs text-slate-300 flex items-center gap-1.5">
+                  <Route className="h-3.5 w-3.5" />
+                  Marker remains clickable on map for continuous tracking.
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );

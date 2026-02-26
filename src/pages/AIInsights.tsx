@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+﻿import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Brain, Fuel, Wrench, Navigation, Users, FileCheck, ThumbsUp, ThumbsDown, Clock } from "lucide-react";
@@ -26,7 +26,7 @@ export default function AIInsights() {
   }));
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="page-shell p-6 space-y-6">
       <div className="flex items-center gap-3">
         <Brain className="h-7 w-7 text-fleet-info" />
         <div>
@@ -74,3 +74,4 @@ export default function AIInsights() {
     </div>
   );
 }
+

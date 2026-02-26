@@ -1,4 +1,4 @@
-import {
+﻿import {
   LayoutDashboard,
   Map,
   Navigation,
@@ -13,7 +13,6 @@ import {
   BarChart3,
   FileCheck,
   DollarSign,
-  ChevronLeft,
   Zap,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
@@ -27,7 +26,6 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarTrigger,
   useSidebar,
 } from "@/components/ui/sidebar";
 
@@ -74,24 +72,25 @@ export function AppSidebar() {
   const location = useLocation();
 
   return (
-    <Sidebar collapsible="icon" className="border-r-0">
-      <div className="flex h-14 items-center gap-2 px-4 border-b border-sidebar-border">
-        <Zap className="h-6 w-6 text-sidebar-primary shrink-0" />
+    <Sidebar collapsible="icon" className="border-r-0 bg-transparent">
+      <div className="mx-2 mt-2 flex h-14 items-center gap-2 rounded-xl border border-white/20 bg-white/10 px-4 shadow-[0_10px_28px_rgba(2,6,23,0.28)] backdrop-blur-xl">
+        <Zap className="h-5 w-5 text-cyan-300 shrink-0" />
         {!collapsed && (
-          <span className="text-base font-bold tracking-tight text-sidebar-accent-foreground">
+          <span className="text-base font-bold tracking-tight text-slate-100">
             HyperFleet
           </span>
         )}
       </div>
 
-      <SidebarContent className="pt-2 scrollbar-thin">
+      <SidebarContent className="pt-3 px-1 scrollbar-thin">
         {navSections.map((section) => (
           <SidebarGroup key={section.label}>
             {!collapsed && (
-              <SidebarGroupLabel className="text-[10px] uppercase tracking-widest text-sidebar-muted font-semibold px-4">
+              <SidebarGroupLabel className="text-[10px] uppercase tracking-[0.18em] text-slate-300/70 font-semibold px-3">
                 {section.label}
               </SidebarGroupLabel>
             )}
+
             <SidebarGroupContent>
               <SidebarMenu>
                 {section.items.map((item) => {
@@ -102,12 +101,13 @@ export function AppSidebar() {
                         asChild
                         isActive={isActive}
                         tooltip={item.title}
+                        className="rounded-lg"
                       >
                         <NavLink
                           to={item.url}
                           end
-                          className="hover:bg-sidebar-accent/50"
-                          activeClassName="bg-sidebar-accent text-sidebar-primary font-medium"
+                          className="rounded-lg border border-transparent text-slate-200/90 transition-all hover:border-white/25 hover:bg-white/10"
+                          activeClassName="border-white/35 bg-white/20 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.24)]"
                         >
                           <item.icon className="h-4 w-4" />
                           <span>{item.title}</span>

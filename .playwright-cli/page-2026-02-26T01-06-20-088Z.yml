@@ -1,0 +1,195 @@
+- generic [ref=e2]:
+  - region "Notifications (F8)":
+    - list
+  - region "Notifications alt+T"
+  - generic [ref=e4]:
+    - generic [ref=e8]:
+      - generic [ref=e9]:
+        - img [ref=e10]
+        - generic [ref=e12]: HyperFleet
+      - generic [ref=e13]:
+        - generic [ref=e14]:
+          - generic [ref=e15]: Operations
+          - list [ref=e17]:
+            - listitem [ref=e18]:
+              - link "Dashboard" [ref=e19] [cursor=pointer]:
+                - /url: /
+                - img [ref=e20]
+                - generic [ref=e25]: Dashboard
+            - listitem [ref=e26]:
+              - link "Fleet Map" [ref=e27] [cursor=pointer]:
+                - /url: /fleet-map
+                - img [ref=e28]
+                - generic [ref=e30]: Fleet Map
+            - listitem [ref=e31]:
+              - link "Trips" [ref=e32] [cursor=pointer]:
+                - /url: /trips
+                - img [ref=e33]
+                - generic [ref=e35]: Trips
+            - listitem [ref=e36]:
+              - link "Dispatch Board" [ref=e37] [cursor=pointer]:
+                - /url: /dispatch
+                - img [ref=e38]
+                - generic [ref=e40]: Dispatch Board
+        - generic [ref=e41]:
+          - generic [ref=e42]: Management
+          - list [ref=e44]:
+            - listitem [ref=e45]:
+              - link "Vehicles" [ref=e46] [cursor=pointer]:
+                - /url: /vehicles
+                - img [ref=e47]
+                - generic [ref=e52]: Vehicles
+            - listitem [ref=e53]:
+              - link "Drivers" [ref=e54] [cursor=pointer]:
+                - /url: /drivers
+                - img [ref=e55]
+                - generic [ref=e60]: Drivers
+            - listitem [ref=e61]:
+              - link "Fuel" [ref=e62] [cursor=pointer]:
+                - /url: /fuel
+                - img [ref=e63]
+                - generic [ref=e66]: Fuel
+            - listitem [ref=e67]:
+              - link "Maintenance" [ref=e68] [cursor=pointer]:
+                - /url: /maintenance
+                - img [ref=e69]
+                - generic [ref=e71]: Maintenance
+        - generic [ref=e72]:
+          - generic [ref=e73]: Intelligence
+          - list [ref=e75]:
+            - listitem [ref=e76]:
+              - link "AI Insights" [ref=e77] [cursor=pointer]:
+                - /url: /ai-insights
+                - img [ref=e78]
+                - generic [ref=e88]: AI Insights
+            - listitem [ref=e89]:
+              - link "Agent Queue" [ref=e90] [cursor=pointer]:
+                - /url: /agent-queue
+                - img [ref=e91]
+                - generic [ref=e94]: Agent Queue
+            - listitem [ref=e95]:
+              - link "Alerts" [ref=e96] [cursor=pointer]:
+                - /url: /alerts
+                - img [ref=e97]
+                - generic [ref=e99]: Alerts
+        - generic [ref=e100]:
+          - generic [ref=e101]: Reports
+          - list [ref=e103]:
+            - listitem [ref=e104]:
+              - link "Analytics" [ref=e105] [cursor=pointer]:
+                - /url: /analytics
+                - img [ref=e106]
+                - generic [ref=e108]: Analytics
+            - listitem [ref=e109]:
+              - link "Compliance" [ref=e110] [cursor=pointer]:
+                - /url: /compliance
+                - img [ref=e111]
+                - generic [ref=e115]: Compliance
+            - listitem [ref=e116]:
+              - link "Cost Breakdown" [ref=e117] [cursor=pointer]:
+                - /url: /costs
+                - img [ref=e118]
+                - generic [ref=e120]: Cost Breakdown
+    - generic [ref=e121]:
+      - banner [ref=e122]:
+        - generic [ref=e123]:
+          - button "Toggle Sidebar" [ref=e124] [cursor=pointer]:
+            - img
+            - generic [ref=e125]: Toggle Sidebar
+          - generic [ref=e126]:
+            - img [ref=e127]
+            - generic [ref=e130]: Search fleet...
+        - generic [ref=e131]:
+          - generic [ref=e132]:
+            - img [ref=e133]
+            - generic [ref=e136]: "6"
+          - generic [ref=e137]: FM
+      - main [ref=e138]:
+        - generic [ref=e140]:
+          - generic [ref=e141]:
+            - generic [ref=e142]:
+              - button "all (25)" [pressed] [ref=e143] [cursor=pointer]:
+                - generic [ref=e144]: all
+                - generic [ref=e145]: (25)
+              - button "moving (13)" [ref=e146] [cursor=pointer]:
+                - generic [ref=e148]: moving
+                - generic [ref=e149]: (13)
+              - button "idle (6)" [ref=e150] [cursor=pointer]:
+                - generic [ref=e152]: idle
+                - generic [ref=e153]: (6)
+              - button "stopped (3)" [ref=e154] [cursor=pointer]:
+                - generic [ref=e156]: stopped
+                - generic [ref=e157]: (3)
+              - button "offline (3)" [ref=e158] [cursor=pointer]:
+                - generic [ref=e160]: offline
+                - generic [ref=e161]: (3)
+            - generic [ref=e162]:
+              - generic [ref=e163]:
+                - generic [ref=e167]: Streaming live
+                - generic [ref=e168]: 01:06:19
+              - button "View Interactive Map" [ref=e169] [cursor=pointer]:
+                - img
+                - text: View Interactive Map
+          - generic [ref=e172]:
+            - generic:
+              - generic:
+                - button "🚚" [ref=e173] [cursor=pointer]:
+                  - generic [ref=e176]: 🚚
+                - button "🚚" [ref=e177] [cursor=pointer]:
+                  - generic [ref=e180]: 🚚
+                - button "🚚" [ref=e181] [cursor=pointer]:
+                  - generic [ref=e183]: 🚚
+                - button "🚚" [ref=e184] [cursor=pointer]:
+                  - generic [ref=e186]: 🚚
+                - button "🚚" [ref=e187] [cursor=pointer]:
+                  - generic [ref=e190]: 🚚
+                - button "🚚" [ref=e191] [cursor=pointer]:
+                  - generic [ref=e194]: 🚚
+                - button "🛻" [ref=e195] [cursor=pointer]:
+                  - generic [ref=e197]: 🛻
+                - button "🚚" [ref=e198] [cursor=pointer]:
+                  - generic [ref=e200]: 🚚
+                - button "🚚" [ref=e201] [cursor=pointer]:
+                  - generic [ref=e204]: 🚚
+                - button "🚚" [ref=e205] [cursor=pointer]:
+                  - generic [ref=e207]: 🚚
+                - button "🚚" [ref=e208] [cursor=pointer]:
+                  - generic [ref=e211]: 🚚
+                - button "🚚" [ref=e212] [cursor=pointer]:
+                  - generic [ref=e214]: 🚚
+                - button "🚚" [ref=e215] [cursor=pointer]:
+                  - generic [ref=e218]: 🚚
+                - button "🚐" [ref=e219] [cursor=pointer]:
+                  - generic [ref=e221]: 🚐
+                - button "🚚" [ref=e222] [cursor=pointer]:
+                  - generic [ref=e225]: 🚚
+                - button "🚚" [ref=e226] [cursor=pointer]:
+                  - generic [ref=e228]: 🚚
+                - button "🚚" [ref=e229] [cursor=pointer]:
+                  - generic [ref=e232]: 🚚
+                - button "🚚" [ref=e233] [cursor=pointer]:
+                  - generic [ref=e235]: 🚚
+                - button "🚚" [ref=e236] [cursor=pointer]:
+                  - generic [ref=e239]: 🚚
+                - button "🚚" [ref=e240] [cursor=pointer]:
+                  - generic [ref=e242]: 🚚
+                - button "🚚" [ref=e243] [cursor=pointer]:
+                  - generic [ref=e246]: 🚚
+                - button "🚚" [ref=e247] [cursor=pointer]:
+                  - generic [ref=e249]: 🚚
+                - button "🚚" [ref=e250] [cursor=pointer]:
+                  - generic [ref=e253]: 🚚
+                - button "🚚" [ref=e254] [cursor=pointer]:
+                  - generic [ref=e256]: 🚚
+                - button "🚚" [ref=e257] [cursor=pointer]:
+                  - generic [ref=e260]: 🚚
+            - generic:
+              - generic [ref=e261]:
+                - button "Zoom in" [ref=e262] [cursor=pointer]: +
+                - button "Zoom out" [ref=e263] [cursor=pointer]: −
+              - generic [ref=e264]:
+                - link "Leaflet" [ref=e265] [cursor=pointer]:
+                  - /url: https://leafletjs.com
+                  - img [ref=e266]
+                  - text: Leaflet
+                - text: "| © OpenStreetMap contributors © CARTO"

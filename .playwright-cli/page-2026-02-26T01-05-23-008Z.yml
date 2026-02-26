@@ -1,0 +1,313 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - region "Notifications (F8)":
+      - list
+    - region "Notifications alt+T"
+    - generic [ref=e4]:
+      - generic [ref=e8]:
+        - generic [ref=e9]:
+          - img [ref=e10]
+          - generic [ref=e12]: HyperFleet
+        - generic [ref=e13]:
+          - generic [ref=e14]:
+            - generic [ref=e15]: Operations
+            - list [ref=e17]:
+              - listitem [ref=e18]:
+                - link "Dashboard" [ref=e19] [cursor=pointer]:
+                  - /url: /
+                  - img [ref=e20]
+                  - generic [ref=e25]: Dashboard
+              - listitem [ref=e26]:
+                - link "Fleet Map" [ref=e27] [cursor=pointer]:
+                  - /url: /fleet-map
+                  - img [ref=e28]
+                  - generic [ref=e30]: Fleet Map
+              - listitem [ref=e31]:
+                - link "Trips" [ref=e32] [cursor=pointer]:
+                  - /url: /trips
+                  - img [ref=e33]
+                  - generic [ref=e35]: Trips
+              - listitem [ref=e36]:
+                - link "Dispatch Board" [ref=e37] [cursor=pointer]:
+                  - /url: /dispatch
+                  - img [ref=e38]
+                  - generic [ref=e40]: Dispatch Board
+          - generic [ref=e41]:
+            - generic [ref=e42]: Management
+            - list [ref=e44]:
+              - listitem [ref=e45]:
+                - link "Vehicles" [ref=e46] [cursor=pointer]:
+                  - /url: /vehicles
+                  - img [ref=e47]
+                  - generic [ref=e52]: Vehicles
+              - listitem [ref=e53]:
+                - link "Drivers" [ref=e54] [cursor=pointer]:
+                  - /url: /drivers
+                  - img [ref=e55]
+                  - generic [ref=e60]: Drivers
+              - listitem [ref=e61]:
+                - link "Fuel" [ref=e62] [cursor=pointer]:
+                  - /url: /fuel
+                  - img [ref=e63]
+                  - generic [ref=e66]: Fuel
+              - listitem [ref=e67]:
+                - link "Maintenance" [ref=e68] [cursor=pointer]:
+                  - /url: /maintenance
+                  - img [ref=e69]
+                  - generic [ref=e71]: Maintenance
+          - generic [ref=e72]:
+            - generic [ref=e73]: Intelligence
+            - list [ref=e75]:
+              - listitem [ref=e76]:
+                - link "AI Insights" [ref=e77] [cursor=pointer]:
+                  - /url: /ai-insights
+                  - img [ref=e78]
+                  - generic [ref=e88]: AI Insights
+              - listitem [ref=e89]:
+                - link "Agent Queue" [ref=e90] [cursor=pointer]:
+                  - /url: /agent-queue
+                  - img [ref=e91]
+                  - generic [ref=e94]: Agent Queue
+              - listitem [ref=e95]:
+                - link "Alerts" [ref=e96] [cursor=pointer]:
+                  - /url: /alerts
+                  - img [ref=e97]
+                  - generic [ref=e99]: Alerts
+          - generic [ref=e100]:
+            - generic [ref=e101]: Reports
+            - list [ref=e103]:
+              - listitem [ref=e104]:
+                - link "Analytics" [ref=e105] [cursor=pointer]:
+                  - /url: /analytics
+                  - img [ref=e106]
+                  - generic [ref=e108]: Analytics
+              - listitem [ref=e109]:
+                - link "Compliance" [ref=e110] [cursor=pointer]:
+                  - /url: /compliance
+                  - img [ref=e111]
+                  - generic [ref=e115]: Compliance
+              - listitem [ref=e116]:
+                - link "Cost Breakdown" [ref=e117] [cursor=pointer]:
+                  - /url: /costs
+                  - img [ref=e118]
+                  - generic [ref=e120]: Cost Breakdown
+      - generic [ref=e121]:
+        - banner [ref=e122]:
+          - generic [ref=e123]:
+            - button "Toggle Sidebar" [ref=e124] [cursor=pointer]:
+              - img
+              - generic [ref=e125]: Toggle Sidebar
+            - generic [ref=e126]:
+              - img [ref=e127]
+              - generic [ref=e130]: Search fleet...
+          - generic [ref=e131]:
+            - generic [ref=e132]:
+              - img [ref=e133]
+              - generic [ref=e136]: "6"
+            - generic [ref=e137]: FM
+        - main [ref=e138]:
+          - generic [ref=e139]:
+            - generic [ref=e140]:
+              - heading "Operations Dashboard" [level=1] [ref=e141]
+              - paragraph [ref=e142]: Real-time fleet overview â€” Thursday, 26 February 2026
+            - generic [ref=e143]:
+              - generic [ref=e145]:
+                - generic [ref=e146]:
+                  - generic [ref=e147]: Total Vehicles
+                  - img [ref=e148]
+                - generic [ref=e153]: "25"
+                - paragraph [ref=e154]: 13 active Â· 6 idle Â· 3 offline
+              - generic [ref=e156]:
+                - generic [ref=e157]:
+                  - generic [ref=e158]: Active Trips
+                  - img [ref=e159]
+                - generic [ref=e161]: "9"
+                - paragraph [ref=e162]: In progress now
+              - generic [ref=e164]:
+                - generic [ref=e165]:
+                  - generic [ref=e166]: Fuel Spend (GHS)
+                  - img [ref=e167]
+                - generic [ref=e170]: â‚µ12,180
+                - paragraph [ref=e171]: This week
+              - generic [ref=e173]:
+                - generic [ref=e174]:
+                  - generic [ref=e175]: Pending Alerts
+                  - img [ref=e176]
+                - generic [ref=e178]: "6"
+                - paragraph [ref=e179]: Unacknowledged
+              - generic [ref=e181]:
+                - generic [ref=e182]:
+                  - generic [ref=e183]: Fleet Health
+                  - img [ref=e184]
+                - generic [ref=e186]: 77%
+                - paragraph [ref=e187]: Average score
+            - generic [ref=e188]:
+              - generic [ref=e189]:
+                - generic [ref=e191]:
+                  - img [ref=e192]
+                  - generic [ref=e202]:
+                    - heading "AI Agent Proposals" [level=3] [ref=e203]
+                    - paragraph [ref=e204]: Recommendations requiring your action
+                - generic [ref=e205]:
+                  - generic [ref=e206]:
+                    - generic [ref=e207]:
+                      - generic [ref=e208]:
+                        - generic [ref=e209]:
+                          - generic [ref=e210]: Fuel Anomaly Agent
+                          - generic [ref=e211]: critical
+                        - paragraph [ref=e212]: Suspected fuel theft — GR-4456-22
+                      - generic [ref=e213]:
+                        - generic [ref=e214]: 94%
+                        - generic [ref=e215]: confidence
+                    - paragraph [ref=e216]: Vehicle GR-4456-22 consumed 42% more fuel than its baseline on the Lomé-Cotonou corridor yesterday. Deviation exceeds 3σ from historical average. Driver Akosua Darko has no prior anomaly flags. Recommend physical tank inspection and fuel log review.
+                    - generic [ref=e217]:
+                      - button "Approve" [ref=e218] [cursor=pointer]:
+                        - img
+                        - text: Approve
+                      - button "Reject" [ref=e219] [cursor=pointer]:
+                        - img
+                        - text: Reject
+                      - button "Defer" [ref=e220] [cursor=pointer]:
+                        - img
+                        - text: Defer
+                  - generic [ref=e221]:
+                    - generic [ref=e222]:
+                      - generic [ref=e223]:
+                        - generic [ref=e224]:
+                          - generic [ref=e225]: Predictive Maintenance Agent
+                          - generic [ref=e226]: warning
+                        - paragraph [ref=e227]: Brake system attention — GR-3310-23
+                      - generic [ref=e228]:
+                        - generic [ref=e229]: 87%
+                        - generic [ref=e230]: confidence
+                    - paragraph [ref=e231]: Vehicle GR-3310-23 shows 78% probability of brake pad failure within the next 2,000 km based on wear pattern analysis and mileage since last replacement. Recommend scheduling brake inspection within 5 business days.
+                    - generic [ref=e232]:
+                      - button "Approve" [ref=e233] [cursor=pointer]:
+                        - img
+                        - text: Approve
+                      - button "Reject" [ref=e234] [cursor=pointer]:
+                        - img
+                        - text: Reject
+                      - button "Defer" [ref=e235] [cursor=pointer]:
+                        - img
+                        - text: Defer
+                  - generic [ref=e236]:
+                    - generic [ref=e237]:
+                      - generic [ref=e238]:
+                        - generic [ref=e239]:
+                          - generic [ref=e240]: Route Intelligence Agent
+                          - generic [ref=e241]: info
+                        - paragraph [ref=e242]: Faster route available — Trip T6
+                      - generic [ref=e243]:
+                        - generic [ref=e244]: 82%
+                        - generic [ref=e245]: confidence
+                    - paragraph [ref=e246]: Trip T6 (Tema→Lagos) can save approximately 45 minutes by routing through Aflao-Lomé-Cotonou instead of the current Ho-Kpalimé corridor. Border wait times at Aflao are currently averaging 25 minutes vs 90 minutes at Kodjoviakopé.
+                    - generic [ref=e247]:
+                      - button "Approve" [ref=e248] [cursor=pointer]:
+                        - img
+                        - text: Approve
+                      - button "Reject" [ref=e249] [cursor=pointer]:
+                        - img
+                        - text: Reject
+                      - button "Defer" [ref=e250] [cursor=pointer]:
+                        - img
+                        - text: Defer
+                  - generic [ref=e251]:
+                    - generic [ref=e252]:
+                      - generic [ref=e253]:
+                        - generic [ref=e254]:
+                          - generic [ref=e255]: Driver Behavior Agent
+                          - generic [ref=e256]: warning
+                        - paragraph [ref=e257]: Deteriorating driving pattern — Emmanuel Tetteh
+                      - generic [ref=e258]:
+                        - generic [ref=e259]: 91%
+                        - generic [ref=e260]: confidence
+                    - paragraph [ref=e261]: "Emmanuel Tetteh's behavior score has dropped from 82 to 67 over the past 14 days. Key concerns: 8 harsh braking events (3x fleet average), 12 instances of exceeding 90 km/h in urban zones. Pattern correlates with shift change to night driving. Recommend coaching session and shift review."
+                    - generic [ref=e262]:
+                      - button "Approve" [ref=e263] [cursor=pointer]:
+                        - img
+                        - text: Approve
+                      - button "Reject" [ref=e264] [cursor=pointer]:
+                        - img
+                        - text: Reject
+                      - button "Defer" [ref=e265] [cursor=pointer]:
+                        - img
+                        - text: Defer
+              - generic [ref=e266]:
+                - generic [ref=e267]:
+                  - heading "Activity Feed" [level=3] [ref=e268]
+                  - paragraph [ref=e269]: Latest fleet events
+                - generic [ref=e270]:
+                  - generic [ref=e271]:
+                    - img [ref=e273]
+                    - generic [ref=e276]:
+                      - paragraph [ref=e277]: Trip T11 completed — Accra → Cape Coast delivered on time
+                      - paragraph [ref=e278]: 09:30
+                  - generic [ref=e279]:
+                    - img [ref=e281]
+                    - generic [ref=e284]:
+                      - paragraph [ref=e285]: GR-8891-24 entered Togo border zone
+                      - paragraph [ref=e286]: 09:15
+                  - generic [ref=e287]:
+                    - img [ref=e289]
+                    - generic [ref=e292]:
+                      - paragraph [ref=e293]: "Fuel logged: 150L at TotalEnergies Tema for GR-1193-23"
+                      - paragraph [ref=e294]: 08:45
+                  - generic [ref=e295]:
+                    - img [ref=e297]
+                    - generic [ref=e299]:
+                      - paragraph [ref=e300]: Tyre puncture reported by Gifty Amoah — GR-3389-22 at Nkawkaw
+                      - paragraph [ref=e301]: 08:20
+                  - generic [ref=e302]:
+                    - img [ref=e304]
+                    - generic [ref=e306]:
+                      - paragraph [ref=e307]: "Service overdue: GR-6632-23 — 5,200 km past scheduled oil change"
+                      - paragraph [ref=e308]: 07:00
+                  - generic [ref=e309]:
+                    - img [ref=e311]
+                    - generic [ref=e313]:
+                      - paragraph [ref=e314]: Nana Agyemang operating with expired license — immediate action required
+                      - paragraph [ref=e315]: 05:00
+                  - generic [ref=e316]:
+                    - img [ref=e318]
+                    - generic [ref=e321]:
+                      - paragraph [ref=e322]: Trip T12 completed — Cotonou → Lagos delivered on time
+                      - paragraph [ref=e323]: 08:00
+                  - generic [ref=e324]:
+                    - img [ref=e326]
+                    - generic [ref=e329]:
+                      - paragraph [ref=e330]: GR-4456-22 exited Cotonou delivery zone
+                      - paragraph [ref=e331]: 06:30
+            - generic [ref=e332]:
+              - generic [ref=e333]:
+                - heading "Fuel Consumption (7-day)" [level=3] [ref=e335]
+                - img [ref=e340]:
+                  - generic [ref=e345]:
+                    - generic [ref=e347]: Mon
+                    - generic [ref=e349]: Tue
+                    - generic [ref=e351]: Wed
+                    - generic [ref=e353]: Thu
+                    - generic [ref=e355]: Fri
+                    - generic [ref=e357]: Sat
+                    - generic [ref=e359]: Sun
+                  - generic [ref=e361]:
+                    - generic [ref=e363]: "0"
+                    - generic [ref=e365]: "300"
+                    - generic [ref=e367]: "600"
+                    - generic [ref=e369]: "900"
+                    - generic [ref=e371]: "1200"
+              - generic [ref=e372]:
+                - heading "Driver Score Distribution" [level=3] [ref=e374]
+                - img [ref=e379]:
+                  - generic [ref=e384]:
+                    - generic [ref=e386]: 60-69
+                    - generic [ref=e388]: 70-79
+                    - generic [ref=e390]: 80-89
+                    - generic [ref=e392]: 90-100
+                  - generic [ref=e394]:
+                    - generic [ref=e396]: "0"
+                    - generic [ref=e398]: "2"
+                    - generic [ref=e400]: "4"
+                    - generic [ref=e402]: "6"
+                    - generic [ref=e404]: "8"
+  - generic [ref=e405]: "2"

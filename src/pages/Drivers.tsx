@@ -1,4 +1,4 @@
-import { Badge } from "@/components/ui/badge";
+﻿import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { drivers, getVehicleById } from "@/data/mock-data";
 
@@ -10,7 +10,7 @@ const licenseColors: Record<string, string> = {
 
 export default function Drivers() {
   return (
-    <div className="p-6 space-y-6">
+    <div className="page-shell p-6 space-y-6">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Driver Management</h1>
         <p className="text-sm text-muted-foreground">{drivers.length} registered drivers</p>
@@ -47,8 +47,8 @@ export default function Drivers() {
                       <span className="text-sm font-medium">{d.behaviorScore}/100</span>
                     </div>
                   </TableCell>
-                  <TableCell className="font-mono text-xs">{vehicle?.registration ?? "—"}</TableCell>
-                  <TableCell className="text-sm">{d.activeTrip ?? "—"}</TableCell>
+                  <TableCell className="font-mono text-xs">{vehicle?.registration ?? "â€”"}</TableCell>
+                  <TableCell className="text-sm">{d.activeTrip ?? "â€”"}</TableCell>
                   <TableCell className="text-xs text-muted-foreground">{d.phone}</TableCell>
                 </TableRow>
               );
@@ -59,3 +59,4 @@ export default function Drivers() {
     </div>
   );
 }
+

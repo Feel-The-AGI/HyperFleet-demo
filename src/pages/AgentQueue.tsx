@@ -1,4 +1,4 @@
-import { Badge } from "@/components/ui/badge";
+﻿import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { agentProposals } from "@/data/mock-data";
 import { ThumbsUp, ThumbsDown, Clock } from "lucide-react";
@@ -15,7 +15,7 @@ export default function AgentQueue() {
   const filtered = filter === "all" ? agentProposals : agentProposals.filter(p => p.agentType === filter);
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="page-shell p-6 space-y-6">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Agent Proposal Queue</h1>
         <p className="text-sm text-muted-foreground">{agentProposals.filter(p => p.status === "pending").length} pending proposals</p>
@@ -23,7 +23,7 @@ export default function AgentQueue() {
 
       <div className="flex gap-2 flex-wrap">
         {["all", "fuel", "maintenance", "route", "behavior", "compliance"].map(t => (
-          <button key={t} onClick={() => setFilter(t)} className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${filter === t ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-accent"}`}>
+          <button key={t} onClick={() => setFilter(t)} className={`glass-filter-pill ${filter === t ? "glass-filter-pill-active" : "glass-filter-pill-idle"}`}>
             {t === "all" ? "All" : t.charAt(0).toUpperCase() + t.slice(1)}
           </button>
         ))}
@@ -56,3 +56,4 @@ export default function AgentQueue() {
     </div>
   );
 }
+

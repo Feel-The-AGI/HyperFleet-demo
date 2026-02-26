@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+﻿import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { trips, getDriverById, getVehicleById, type TripStatus } from "@/data/mock-data";
@@ -11,7 +11,7 @@ const columns: { label: string; status: TripStatus; color: string }[] = [
 
 export default function DispatchBoard() {
   return (
-    <div className="p-6 space-y-6">
+    <div className="page-shell p-6 space-y-6">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Dispatch Board</h1>
         <p className="text-sm text-muted-foreground">Kanban view of all fleet operations</p>
@@ -38,11 +38,11 @@ export default function DispatchBoard() {
                           <span className="font-mono text-xs font-medium">{t.id.toUpperCase()}</span>
                           <span className="text-xs text-muted-foreground">{t.distance} km</span>
                         </div>
-                        <p className="text-sm font-medium">{t.origin} → {t.destination}</p>
+                        <p className="text-sm font-medium">{t.origin} â†’ {t.destination}</p>
                         <div className="flex items-center gap-2 text-xs text-muted-foreground">
                           <span>{driver?.name ?? "Unassigned"}</span>
-                          <span>·</span>
-                          <span>{vehicle?.registration ?? "—"}</span>
+                          <span>Â·</span>
+                          <span>{vehicle?.registration ?? "â€”"}</span>
                         </div>
                         {t.status === "in_progress" && (
                           <div className="flex items-center gap-2">
@@ -66,3 +66,4 @@ export default function DispatchBoard() {
     </div>
   );
 }
+

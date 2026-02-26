@@ -1,4 +1,4 @@
-import { Badge } from "@/components/ui/badge";
+﻿import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { drivers } from "@/data/mock-data";
 import { FileCheck, AlertTriangle, CheckCircle } from "lucide-react";
@@ -9,7 +9,7 @@ export default function Compliance() {
   const valid = drivers.filter(d => d.licenseStatus === "valid");
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="page-shell p-6 space-y-6">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Compliance</h1>
         <p className="text-sm text-muted-foreground">Document status and regulatory compliance</p>
@@ -23,7 +23,7 @@ export default function Compliance() {
 
       {expired.length > 0 && (
         <Card className="border-fleet-danger/30">
-          <CardHeader className="pb-2"><CardTitle className="text-base text-fleet-danger">Expired Documents — Immediate Action Required</CardTitle></CardHeader>
+          <CardHeader className="pb-2"><CardTitle className="text-base text-fleet-danger">Expired Documents â€” Immediate Action Required</CardTitle></CardHeader>
           <CardContent className="space-y-2">
             {expired.map(d => (
               <div key={d.id} className="flex items-center justify-between p-2 rounded bg-fleet-danger/5">
@@ -57,3 +57,4 @@ export default function Compliance() {
     </div>
   );
 }
+

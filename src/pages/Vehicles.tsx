@@ -1,4 +1,4 @@
-import { Badge } from "@/components/ui/badge";
+﻿import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Progress } from "@/components/ui/progress";
 import { vehicles, getDriverById, type VehicleStatus } from "@/data/mock-data";
@@ -12,7 +12,7 @@ const statusBadge: Record<VehicleStatus, string> = {
 
 export default function Vehicles() {
   return (
-    <div className="p-6 space-y-6">
+    <div className="page-shell p-6 space-y-6">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Vehicle Management</h1>
         <p className="text-sm text-muted-foreground">{vehicles.length} vehicles in fleet</p>
@@ -45,7 +45,7 @@ export default function Vehicles() {
                       <span className="text-xs">{v.healthScore}</span>
                     </div>
                   </TableCell>
-                  <TableCell className="text-sm">{driver?.name ?? "—"}</TableCell>
+                  <TableCell className="text-sm">{driver?.name ?? "â€”"}</TableCell>
                   <TableCell className="text-xs text-muted-foreground">{v.lastLocation.label}</TableCell>
                 </TableRow>
               );
@@ -56,3 +56,4 @@ export default function Vehicles() {
     </div>
   );
 }
+

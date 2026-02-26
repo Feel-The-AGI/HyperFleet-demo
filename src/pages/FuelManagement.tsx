@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+﻿import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { fuelLogs, getDriverById, getVehicleById, fuelConsumptionTrend } from "@/data/mock-data";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
@@ -6,7 +6,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
 
 export default function FuelManagement() {
   return (
-    <div className="p-6 space-y-6">
+    <div className="page-shell p-6 space-y-6">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Fuel Management</h1>
         <p className="text-sm text-muted-foreground">Fleet fuel consumption and cost tracking</p>
@@ -14,7 +14,7 @@ export default function FuelManagement() {
 
       <div className="grid lg:grid-cols-3 gap-4">
         <Card><CardContent className="p-4"><p className="text-xs text-muted-foreground">Total Litres (Week)</p><p className="text-2xl font-bold">{fuelConsumptionTrend.reduce((a, d) => a + d.litres, 0).toLocaleString()} L</p></CardContent></Card>
-        <Card><CardContent className="p-4"><p className="text-xs text-muted-foreground">Total Cost (GHS)</p><p className="text-2xl font-bold">₵{fuelConsumptionTrend.reduce((a, d) => a + d.cost, 0).toLocaleString()}</p></CardContent></Card>
+        <Card><CardContent className="p-4"><p className="text-xs text-muted-foreground">Total Cost (GHS)</p><p className="text-2xl font-bold">â‚µ{fuelConsumptionTrend.reduce((a, d) => a + d.cost, 0).toLocaleString()}</p></CardContent></Card>
         <Card><CardContent className="p-4"><p className="text-xs text-muted-foreground">Avg per Vehicle/Day</p><p className="text-2xl font-bold">{Math.round(fuelConsumptionTrend.reduce((a, d) => a + d.litres, 0) / 7 / 25)} L</p></CardContent></Card>
       </div>
 
@@ -53,10 +53,10 @@ export default function FuelManagement() {
               return (
                 <TableRow key={f.id}>
                   <TableCell className="text-sm">{f.date}</TableCell>
-                  <TableCell className="font-mono text-xs">{vehicle?.registration ?? "—"}</TableCell>
-                  <TableCell className="text-sm">{driver?.name ?? "—"}</TableCell>
+                  <TableCell className="font-mono text-xs">{vehicle?.registration ?? "â€”"}</TableCell>
+                  <TableCell className="text-sm">{driver?.name ?? "â€”"}</TableCell>
                   <TableCell className="text-sm font-medium">{f.litres} L</TableCell>
-                  <TableCell className="text-sm">{f.currency === "GHS" ? "₵" : ""}{f.cost.toLocaleString()} {f.currency}</TableCell>
+                  <TableCell className="text-sm">{f.currency === "GHS" ? "â‚µ" : ""}{f.cost.toLocaleString()} {f.currency}</TableCell>
                   <TableCell className="text-sm">{f.station}</TableCell>
                   <TableCell className="text-xs text-muted-foreground">{f.location}, {f.country}</TableCell>
                 </TableRow>
@@ -68,3 +68,4 @@ export default function FuelManagement() {
     </div>
   );
 }
+
