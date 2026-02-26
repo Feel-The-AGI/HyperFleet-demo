@@ -47,8 +47,8 @@ export default function Drivers() {
                       <span className="text-sm font-medium">{d.behaviorScore}/100</span>
                     </div>
                   </TableCell>
-                  <TableCell className="font-mono text-xs">{vehicle?.registration ?? "â€”"}</TableCell>
-                  <TableCell className="text-sm">{d.activeTrip ?? "â€”"}</TableCell>
+                  <TableCell className="font-mono text-xs">{vehicle?.registration ?? "--"}</TableCell>
+                  <TableCell className="text-sm">{d.activeTrip ?? "--"}</TableCell>
                   <TableCell className="text-xs text-muted-foreground">{d.phone}</TableCell>
                 </TableRow>
               );

@@ -45,7 +45,7 @@ export default function Vehicles() {
                       <span className="text-xs">{v.healthScore}</span>
                     </div>
                   </TableCell>
-                  <TableCell className="text-sm">{driver?.name ?? "â€”"}</TableCell>
+                  <TableCell className="text-sm">{driver?.name ?? "--"}</TableCell>
                   <TableCell className="text-xs text-muted-foreground">{v.lastLocation.label}</TableCell>
                 </TableRow>
               );

@@ -23,7 +23,7 @@ export default function Compliance() {
 
       {expired.length > 0 && (
         <Card className="border-fleet-danger/30">
-          <CardHeader className="pb-2"><CardTitle className="text-base text-fleet-danger">Expired Documents â€” Immediate Action Required</CardTitle></CardHeader>
+          <CardHeader className="pb-2"><CardTitle className="text-base text-fleet-danger">Expired Documents - Immediate Action Required</CardTitle></CardHeader>
           <CardContent className="space-y-2">
             {expired.map(d => (
               <div key={d.id} className="flex items-center justify-between p-2 rounded bg-fleet-danger/5">

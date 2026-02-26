@@ -14,7 +14,7 @@ export default function FuelManagement() {
 
       <div className="grid lg:grid-cols-3 gap-4">
         <Card><CardContent className="p-4"><p className="text-xs text-muted-foreground">Total Litres (Week)</p><p className="text-2xl font-bold">{fuelConsumptionTrend.reduce((a, d) => a + d.litres, 0).toLocaleString()} L</p></CardContent></Card>
-        <Card><CardContent className="p-4"><p className="text-xs text-muted-foreground">Total Cost (GHS)</p><p className="text-2xl font-bold">â‚µ{fuelConsumptionTrend.reduce((a, d) => a + d.cost, 0).toLocaleString()}</p></CardContent></Card>
+        <Card><CardContent className="p-4"><p className="text-xs text-muted-foreground">Total Cost (GHS)</p><p className="text-2xl font-bold">GHS {fuelConsumptionTrend.reduce((a, d) => a + d.cost, 0).toLocaleString()}</p></CardContent></Card>
         <Card><CardContent className="p-4"><p className="text-xs text-muted-foreground">Avg per Vehicle/Day</p><p className="text-2xl font-bold">{Math.round(fuelConsumptionTrend.reduce((a, d) => a + d.litres, 0) / 7 / 25)} L</p></CardContent></Card>
       </div>
 
@@ -53,10 +53,14 @@ export default function FuelManagement() {
               return (
                 <TableRow key={f.id}>
                   <TableCell className="text-sm">{f.date}</TableCell>
-                  <TableCell className="font-mono text-xs">{vehicle?.registration ?? "â€”"}</TableCell>
-                  <TableCell className="text-sm">{driver?.name ?? "â€”"}</TableCell>
+                  <TableCell className="font-mono text-xs">{vehicle?.registration ?? "--"}</TableCell>
+                  <TableCell className="text-sm">{driver?.name ?? "--"}</TableCell>
                   <TableCell className="text-sm font-medium">{f.litres} L</TableCell>
-                  <TableCell className="text-sm">{f.currency === "GHS" ? "â‚µ" : ""}{f.cost.toLocaleString()} {f.currency}</TableCell>
+                  <TableCell className="text-sm">
+                    {f.currency === "GHS"
+                      ? `GHS ${f.cost.toLocaleString()}`
+                      : `${f.cost.toLocaleString()} ${f.currency}`}
+                  </TableCell>
                   <TableCell className="text-sm">{f.station}</TableCell>
                   <TableCell className="text-xs text-muted-foreground">{f.location}, {f.country}</TableCell>
                 </TableRow>

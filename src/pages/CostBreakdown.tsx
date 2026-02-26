@@ -12,11 +12,11 @@ const costByCategory = [
 ];
 
 const costByRoute = [
-  { route: "Accraâ€“Kumasi", cost: 34200 },
-  { route: "Temaâ€“Lagos", cost: 28900 },
-  { route: "Accraâ€“LomÃ©", cost: 18700 },
-  { route: "Kumasiâ€“Tamale", cost: 15400 },
-  { route: "LomÃ©â€“Cotonou", cost: 12300 },
+  { route: "Accra-Kumasi", cost: 34200 },
+  { route: "Tema-Lagos", cost: 28900 },
+  { route: "Accra-Lome", cost: 18700 },
+  { route: "Kumasi-Tamale", cost: 15400 },
+  { route: "Lome-Cotonou", cost: 12300 },
 ];
 
 const COLORS = ["hsl(210, 80%, 55%)", "hsl(152, 60%, 40%)", "hsl(36, 90%, 50%)", "hsl(280, 60%, 55%)", "hsl(0, 72%, 51%)", "hsl(180, 50%, 45%)"];
@@ -28,7 +28,7 @@ export default function CostBreakdown() {
     <div className="page-shell p-6 space-y-6">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Cost Breakdown</h1>
-        <p className="text-sm text-muted-foreground">Operational cost analysis â€” â‚µ{total.toLocaleString()} total this month</p>
+        <p className="text-sm text-muted-foreground">Operational cost analysis - GHS {total.toLocaleString()} total this month</p>
       </div>
 
       <div className="grid lg:grid-cols-2 gap-6">

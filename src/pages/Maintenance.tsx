@@ -33,13 +33,13 @@ export default function MaintenancePage() {
               const vehicle = getVehicleById(m.vehicleId);
               return (
                 <TableRow key={m.id}>
-                  <TableCell className="font-mono text-xs">{vehicle?.registration ?? "â€”"}</TableCell>
+                  <TableCell className="font-mono text-xs">{vehicle?.registration ?? "--"}</TableCell>
                   <TableCell className="text-sm">{m.type}</TableCell>
                   <TableCell><Badge className={`text-[10px] ${statusBadge[m.status]}`}>{m.status}</Badge></TableCell>
                   <TableCell className="text-sm">{m.dueDate}</TableCell>
-                  <TableCell className="text-sm">{m.completedDate ?? "â€”"}</TableCell>
-                  <TableCell className="text-sm">{m.cost ? `â‚µ${m.cost.toLocaleString()}` : "â€”"}</TableCell>
-                  <TableCell className="text-xs text-muted-foreground max-w-48 truncate">{m.notes ?? m.workshop ?? "â€”"}</TableCell>
+                  <TableCell className="text-sm">{m.completedDate ?? "--"}</TableCell>
+                  <TableCell className="text-sm">{m.cost ? `GHS ${m.cost.toLocaleString()}` : "--"}</TableCell>
+                  <TableCell className="text-xs text-muted-foreground max-w-48 truncate">{m.notes ?? m.workshop ?? "--"}</TableCell>
                 </TableRow>
               );
             })}

@@ -38,11 +38,11 @@ export default function DispatchBoard() {
                           <span className="font-mono text-xs font-medium">{t.id.toUpperCase()}</span>
                           <span className="text-xs text-muted-foreground">{t.distance} km</span>
                         </div>
-                        <p className="text-sm font-medium">{t.origin} â†’ {t.destination}</p>
+                        <p className="text-sm font-medium">{t.origin} {"->"} {t.destination}</p>
                         <div className="flex items-center gap-2 text-xs text-muted-foreground">
                           <span>{driver?.name ?? "Unassigned"}</span>
-                          <span>Â·</span>
-                          <span>{vehicle?.registration ?? "â€”"}</span>
+                          <span>|</span>
+                          <span>{vehicle?.registration ?? "--"}</span>
                         </div>
                         {t.status === "in_progress" && (
                           <div className="flex items-center gap-2">
