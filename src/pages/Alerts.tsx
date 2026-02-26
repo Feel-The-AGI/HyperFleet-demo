@@ -1,8 +1,10 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { CheckCircle2, Siren, TriangleAlert } from "lucide-react";
 import { alerts, type AlertUrgency } from "@/data/mock-data";
 import { Button } from "@/components/ui/button";
 import { DataToolbar, FilterChipBar, InspectorPanel, PageHeader, StatusPill } from "@/components/product";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { toast } from "sonner";
 
 const urgencyOrder: Array<AlertUrgency | "all"> = ["all", "critical", "warning", "info"];
 
@@ -13,28 +15,104 @@ const urgencyTone: Record<AlertUrgency, "danger" | "warning" | "info"> = {
 };
 
 export default function AlertsPage() {
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [alertItems, setAlertItems] = useState(alerts);
   const [filter, setFilter] = useState<AlertUrgency | "all">("all");
   const [search, setSearch] = useState("");
   const [selectedId, setSelectedId] = useState<string>(alerts[0]?.id ?? "");
 
+  useEffect(() => {
+    const requestedAlertId = searchParams.get("alert");
+    const requestedVehicleId = searchParams.get("vehicle");
+    if (!requestedAlertId && !requestedVehicleId) return;
+
+    const nextParams = new URLSearchParams(searchParams);
+    nextParams.delete("alert");
+    nextParams.delete("vehicle");
+    nextParams.delete("maintenance");
+
+    const target = requestedAlertId
+      ? alertItems.find((alert) => alert.id === requestedAlertId)
+      : alertItems.find((alert) => alert.relatedId === requestedVehicleId);
+
+    if (target) {
+      setFilter("all");
+      setSearch("");
+      setSelectedId(target.id);
+      setSearchParams(nextParams, { replace: true });
+      return;
+    }
+
+    setSearchParams(nextParams, { replace: true });
+  }, [alertItems, searchParams, setSearchParams]);
+
   const counts = useMemo(
     () => ({
-      all: alerts.length,
-      critical: alerts.filter((alert) => alert.urgency === "critical").length,
-      warning: alerts.filter((alert) => alert.urgency === "warning").length,
-      info: alerts.filter((alert) => alert.urgency === "info").length,
+      all: alertItems.length,
+      critical: alertItems.filter((alert) => alert.urgency === "critical").length,
+      warning: alertItems.filter((alert) => alert.urgency === "warning").length,
+      info: alertItems.filter((alert) => alert.urgency === "info").length,
     }),
-    [],
+    [alertItems],
   );
 
   const filtered = useMemo(() => {
-    const pool = filter === "all" ? alerts : alerts.filter((alert) => alert.urgency === filter);
+    const pool = filter === "all" ? alertItems : alertItems.filter((alert) => alert.urgency === filter);
     if (!search.trim()) return pool;
     const q = search.toLowerCase();
     return pool.filter((alert) => [alert.title, alert.message, alert.category].join(" ").toLowerCase().includes(q));
-  }, [filter, search]);
+  }, [alertItems, filter, search]);
 
   const selected = filtered.find((alert) => alert.id === selectedId) ?? filtered[0] ?? null;
+
+  const handleAcknowledge = () => {
+    if (!selected) return;
+    if (selected.acknowledged) {
+      toast.info("Alert is already acknowledged.");
+      return;
+    }
+
+    setAlertItems((current) =>
+      current.map((item) => (item.id === selected.id ? { ...item, acknowledged: true } : item)),
+    );
+    toast.success(`Acknowledged ${selected.title}`);
+  };
+
+  const handleEscalate = () => {
+    if (!selected) return;
+    toast.warning(`Escalating ${selected.title} to duty queue`);
+    navigate(`/agent-queue?alert=${selected.id}`);
+  };
+
+  const handleOpenLinkedRecord = () => {
+    if (!selected?.relatedId) {
+      toast.info("This alert has no linked entity.");
+      return;
+    }
+
+    if (selected.relatedId.startsWith("v")) {
+      if (selected.category === "maintenance") {
+        navigate(`/maintenance?vehicle=${selected.relatedId}`);
+        return;
+      }
+
+      if (selected.category === "geofence" || selected.category === "fuel" || selected.category === "incident") {
+        navigate(`/fleet-map?vehicle=${selected.relatedId}`);
+        return;
+      }
+
+      navigate(`/vehicles?vehicle=${selected.relatedId}`);
+      return;
+    }
+
+    if (selected.relatedId.startsWith("d")) {
+      navigate(`/drivers?driver=${selected.relatedId}`);
+      return;
+    }
+
+    toast.info("Linked record type is not supported yet.");
+  };
 
   return (
     <div className="page-shell">
@@ -103,9 +181,18 @@ export default function AlertsPage() {
             </div>
 
             <div className="grid grid-cols-2 gap-2">
-              <Button size="sm"><CheckCircle2 className="mr-1 h-3.5 w-3.5" />Acknowledge</Button>
-              <Button size="sm" variant="outline"><Siren className="mr-1 h-3.5 w-3.5" />Escalate</Button>
-              <Button size="sm" variant="secondary" className="col-span-2"><TriangleAlert className="mr-1 h-3.5 w-3.5" />Open Linked Record</Button>
+              <Button size="sm" onClick={handleAcknowledge}>
+                <CheckCircle2 className="mr-1 h-3.5 w-3.5" />
+                Acknowledge
+              </Button>
+              <Button size="sm" variant="outline" onClick={handleEscalate}>
+                <Siren className="mr-1 h-3.5 w-3.5" />
+                Escalate
+              </Button>
+              <Button size="sm" variant="secondary" className="col-span-2" onClick={handleOpenLinkedRecord}>
+                <TriangleAlert className="mr-1 h-3.5 w-3.5" />
+                Open Linked Record
+              </Button>
             </div>
           </InspectorPanel>
         ) : null}

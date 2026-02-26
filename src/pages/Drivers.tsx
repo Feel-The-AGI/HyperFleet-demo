@@ -1,10 +1,11 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AlertTriangle, Phone, ShieldCheck, UserRound } from "lucide-react";
 import { drivers, getVehicleById } from "@/data/mock-data";
 import { DataToolbar, FilterChipBar, InspectorPanel, PageHeader, StatusPill } from "@/components/product";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
+import { useSearchParams } from "react-router-dom";
 
 const statusOrder = ["all", "valid", "expiring", "expired"] as const;
 
@@ -17,9 +18,29 @@ const statusTone = {
 } as const;
 
 export default function Drivers() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [filter, setFilter] = useState<LicenseFilter>("all");
   const [search, setSearch] = useState("");
   const [selectedId, setSelectedId] = useState<string>(drivers[0]?.id ?? "");
+
+  useEffect(() => {
+    const requestedDriverId = searchParams.get("driver");
+    if (!requestedDriverId) return;
+
+    const nextParams = new URLSearchParams(searchParams);
+    nextParams.delete("driver");
+    const target = drivers.find((driver) => driver.id === requestedDriverId);
+
+    if (!target) {
+      setSearchParams(nextParams, { replace: true });
+      return;
+    }
+
+    setFilter("all");
+    setSearch("");
+    setSelectedId(target.id);
+    setSearchParams(nextParams, { replace: true });
+  }, [searchParams, setSearchParams]);
 
   const counts = useMemo(
     () => ({

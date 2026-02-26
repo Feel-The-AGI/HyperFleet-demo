@@ -1,9 +1,11 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { GripVertical, MapPin, PlusCircle } from "lucide-react";
 import { trips, getDriverById, getVehicleById, type TripStatus } from "@/data/mock-data";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageHeader, StatusPill } from "@/components/product";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { toast } from "sonner";
 
 const laneConfig: Array<{ key: TripStatus; label: string; tone: "info" | "success" | "warning" | "neutral" }> = [
   { key: "scheduled", label: "Scheduled", tone: "info" },
@@ -13,6 +15,8 @@ const laneConfig: Array<{ key: TripStatus; label: string; tone: "info" | "succes
 ];
 
 export default function DispatchBoard() {
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [activeTripId, setActiveTripId] = useState<string>(trips[0]?.id ?? "");
 
   const activeTrip = trips.find((trip) => trip.id === activeTripId) ?? trips[0] ?? null;
@@ -21,6 +25,52 @@ export default function DispatchBoard() {
     () => laneConfig.map((lane) => ({ ...lane, items: trips.filter((trip) => trip.status === lane.key) })),
     [],
   );
+
+  useEffect(() => {
+    const requestedTripId = searchParams.get("trip");
+    const requestedVehicleId = searchParams.get("vehicle");
+    if (!requestedTripId && !requestedVehicleId) return;
+
+    const nextParams = new URLSearchParams(searchParams);
+    nextParams.delete("trip");
+    nextParams.delete("vehicle");
+    nextParams.delete("maintenance");
+
+    const targetTrip = requestedTripId
+      ? trips.find((trip) => trip.id === requestedTripId)
+      : trips.find((trip) => trip.vehicleId === requestedVehicleId);
+
+    if (targetTrip) {
+      setActiveTripId(targetTrip.id);
+      setSearchParams(nextParams, { replace: true });
+      return;
+    }
+
+    setSearchParams(nextParams, { replace: true });
+  }, [searchParams, setSearchParams]);
+
+  const handleAssignDriver = () => {
+    if (!activeTrip) return;
+    if (!activeTrip.driverId) {
+      toast.info("No driver is currently assigned to this trip.");
+      navigate("/drivers");
+      return;
+    }
+
+    toast.success(`Opening driver assignment for ${activeTrip.id.toUpperCase()}`);
+    navigate(`/drivers?driver=${activeTrip.driverId}`);
+  };
+
+  const handleChangeRoute = () => {
+    if (!activeTrip) return;
+    toast.success(`Opening route controls for ${activeTrip.id.toUpperCase()}`);
+    navigate(`/fleet-map?vehicle=${activeTrip.vehicleId}`);
+  };
+
+  const handleOpenTripWorkspace = () => {
+    if (!activeTrip) return;
+    navigate(`/trips?trip=${activeTrip.id}`);
+  };
 
   return (
     <div className="page-shell">
@@ -117,9 +167,9 @@ export default function DispatchBoard() {
               </div>
 
               <div className="grid grid-cols-2 gap-2">
-                <Button size="sm">Assign Driver</Button>
-                <Button size="sm" variant="outline">Change Route</Button>
-                <Button size="sm" variant="secondary" className="col-span-2">Open Trip Workspace</Button>
+                <Button size="sm" onClick={handleAssignDriver}>Assign Driver</Button>
+                <Button size="sm" variant="outline" onClick={handleChangeRoute}>Change Route</Button>
+                <Button size="sm" variant="secondary" className="col-span-2" onClick={handleOpenTripWorkspace}>Open Trip Workspace</Button>
               </div>
             </CardContent>
           </Card>

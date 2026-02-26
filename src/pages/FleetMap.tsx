@@ -26,7 +26,7 @@ import {
   TileLayer,
   useMap,
 } from "react-leaflet";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import MarkerClusterGroup from "react-leaflet-markercluster";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -510,6 +510,7 @@ function FocusSelected({
 
 export default function FleetMap() {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { resolvedTheme } = useTheme();
   const seededFleet = useMemo(() => initializeVehicleRoutes(vehicles), []);
   const routeStateRef = useRef<Record<string, VehicleRouteState>>(seededFleet.routeState);
@@ -657,6 +658,25 @@ export default function FleetMap() {
     setFitPositions(targetVehicles.map((vehicle) => [vehicle.lastLocation.lat, vehicle.lastLocation.lng]));
     setFitToken((value) => value + 1);
   };
+
+  useEffect(() => {
+    const requestedVehicleId = searchParams.get("vehicle");
+    if (!requestedVehicleId) return;
+
+    const nextParams = new URLSearchParams(searchParams);
+    nextParams.delete("vehicle");
+    const target = liveVehicles.find((vehicle) => vehicle.id === requestedVehicleId);
+
+    if (!target) {
+      setSearchParams(nextParams, { replace: true });
+      return;
+    }
+
+    setViewState((current) => ({ ...current, filter: "all", followSelected: true }));
+    setSelectedId(target.id);
+    requestMapFit([target]);
+    setSearchParams(nextParams, { replace: true });
+  }, [liveVehicles, searchParams, setSearchParams]);
 
   useEffect(() => {
     if (!selectedId) return;

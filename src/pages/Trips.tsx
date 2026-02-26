@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ArrowRight, Clock3, Route, Timer } from "lucide-react";
 import { trips, getDriverById, getVehicleById, type Trip, type TripStatus } from "@/data/mock-data";
 import { Progress } from "@/components/ui/progress";
@@ -14,6 +14,7 @@ import {
 } from "@/components/product";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useSearchParams } from "react-router-dom";
 
 const statusOrder: Array<TripStatus | "all"> = ["all", "in_progress", "scheduled", "delayed", "completed"];
 
@@ -30,10 +31,30 @@ function prettyStatus(status: TripStatus | "all") {
 }
 
 export default function Trips() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [filter, setFilter] = useState<TripStatus | "all">("all");
   const [search, setSearch] = useState("");
   const [selectedId, setSelectedId] = useState<string>(trips[0]?.id ?? "");
   const [density, setDensity] = useState<"compact" | "comfortable">("comfortable");
+
+  useEffect(() => {
+    const requestedTripId = searchParams.get("trip");
+    if (!requestedTripId) return;
+
+    const nextParams = new URLSearchParams(searchParams);
+    nextParams.delete("trip");
+    const target = trips.find((trip) => trip.id === requestedTripId);
+
+    if (!target) {
+      setSearchParams(nextParams, { replace: true });
+      return;
+    }
+
+    setFilter("all");
+    setSearch("");
+    setSelectedId(target.id);
+    setSearchParams(nextParams, { replace: true });
+  }, [searchParams, setSearchParams]);
 
   const filtered = useMemo(() => {
     const pool = filter === "all" ? trips : trips.filter((trip) => trip.status === filter);
