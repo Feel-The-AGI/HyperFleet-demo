@@ -1,21 +1,25 @@
-import { useLocation } from "react-router-dom";
 import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 
 const NotFound = () => {
   const location = useLocation();
 
   useEffect(() => {
-    console.error("404 Error: User attempted to access non-existent route:", location.pathname);
+    console.error("404 route not found:", location.pathname);
   }, [location.pathname]);
 
   return (
-    <div className="page-shell flex min-h-[calc(100vh-3.5rem)] items-center justify-center p-6">
-      <div className="panel-glass rounded-2xl border px-8 py-10 text-center w-full max-w-md">
-        <h1 className="mb-2 text-4xl font-bold tracking-tight">404</h1>
-        <p className="mb-5 text-lg text-muted-foreground">Oops! Page not found</p>
-        <a href="/" className="text-primary underline underline-offset-4 hover:text-primary/90">
-          Return to Home
-        </a>
+    <div className="page-shell flex min-h-[calc(100svh-4.25rem)] items-center justify-center">
+      <div className="surface-raised w-full max-w-md rounded-3xl p-10 text-center">
+        <p className="page-eyebrow">Error</p>
+        <h1 className="page-title mt-2">Page Not Found</h1>
+        <p className="mt-3 text-sm text-muted-foreground">
+          The route <span className="font-mono">{location.pathname}</span> does not exist in this workspace.
+        </p>
+        <Button asChild className="mt-6">
+          <a href="/">Return to Dashboard</a>
+        </Button>
       </div>
     </div>
   );

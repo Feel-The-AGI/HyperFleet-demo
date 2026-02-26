@@ -18,4 +18,22 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  build: {
+    chunkSizeWarningLimit: 680,
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes("react-leaflet") || id.includes("leaflet") || id.includes("markercluster")) {
+            return "map-vendor";
+          }
+          if (id.includes("recharts") || id.includes("d3-")) {
+            return "charts-vendor";
+          }
+          if (id.includes("@radix-ui")) {
+            return "radix-vendor";
+          }
+        },
+      },
+    },
+  },
 }));

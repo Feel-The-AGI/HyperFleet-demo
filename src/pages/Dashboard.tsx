@@ -1,189 +1,278 @@
-﻿import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
+import { useMemo, useState } from "react";
 import {
-  Truck, Navigation, Fuel, AlertTriangle, Activity, CheckCircle, MapPin,
-  ShieldAlert, Wrench, Brain, ThumbsUp, ThumbsDown, Clock,
+  Activity,
+  AlertTriangle,
+  Brain,
+  Fuel,
+  Navigation,
+  ShieldCheck,
+  Truck,
 } from "lucide-react";
 import {
-  getFleetStats, agentProposals, activityFeed, fuelConsumptionTrend,
-  tripCompletionData, driverScoreDistribution, type AgentProposal, type ActivityEvent,
-} from "@/data/mock-data";
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 import {
-  ChartContainer, ChartTooltip, ChartTooltipContent,
-} from "@/components/ui/chart";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, LineChart, Line, ResponsiveContainer } from "recharts";
+  activityFeed,
+  agentProposals,
+  driverScoreDistribution,
+  fuelConsumptionTrend,
+  getFleetStats,
+  type AgentProposal,
+} from "@/data/mock-data";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import {
+  EmptyState,
+  InspectorPanel,
+  KpiTile,
+  PageHeader,
+  StatusPill,
+  TimelineBlock,
+  type TimelineItem,
+} from "@/components/product";
 
 const stats = getFleetStats();
 
 const kpiCards = [
-  { label: "Total Vehicles", value: stats.total, sub: `${stats.active} active | ${stats.idle} idle | ${stats.offline} offline`, icon: Truck, color: "text-fleet-info" },
-  { label: "Active Trips", value: stats.activeTrips, sub: "In progress now", icon: Navigation, color: "text-fleet-success" },
-  { label: "Fuel Spend (GHS)", value: `GHS ${stats.totalFuelCostGHS.toLocaleString()}`, sub: "This week", icon: Fuel, color: "text-fleet-warning" },
-  { label: "Pending Alerts", value: stats.pendingAlerts, sub: "Unacknowledged", icon: AlertTriangle, color: "text-fleet-danger" },
-  { label: "Fleet Health", value: `${stats.avgHealthScore}%`, sub: "Average score", icon: Activity, color: "text-fleet-info" },
+  {
+    label: "Fleet Units",
+    value: stats.total,
+    detail: `${stats.active} moving | ${stats.idle} idle | ${stats.offline} offline`,
+    trend: "+2 this week",
+    tone: "positive" as const,
+    icon: Truck,
+  },
+  {
+    label: "Active Trips",
+    value: stats.activeTrips,
+    detail: "Running now",
+    trend: "1 delayed",
+    tone: "warning" as const,
+    icon: Navigation,
+  },
+  {
+    label: "Fuel Spend",
+    value: `GHS ${stats.totalFuelCostGHS.toLocaleString()}`,
+    detail: "Rolling 7 days",
+    trend: "+4.8%",
+    tone: "warning" as const,
+    icon: Fuel,
+  },
+  {
+    label: "Open Alerts",
+    value: stats.pendingAlerts,
+    detail: "Needs acknowledgement",
+    trend: "3 critical",
+    tone: "danger" as const,
+    icon: AlertTriangle,
+  },
+  {
+    label: "Fleet Health",
+    value: `${stats.avgHealthScore}%`,
+    detail: "Average score",
+    trend: "+1.9%",
+    tone: "positive" as const,
+    icon: Activity,
+  },
 ];
 
-const urgencyColors: Record<string, string> = {
-  critical: "bg-fleet-danger text-fleet-danger-foreground",
-  warning: "bg-fleet-warning text-fleet-warning-foreground",
-  info: "bg-fleet-info text-fleet-info-foreground",
+const urgencyTone: Record<AgentProposal["urgency"], "danger" | "warning" | "info"> = {
+  critical: "danger",
+  warning: "warning",
+  info: "info",
 };
-
-const eventIcons: Record<string, React.ElementType> = {
-  "check-circle": CheckCircle,
-  "map-pin": MapPin,
-  fuel: Fuel,
-  "alert-triangle": AlertTriangle,
-  wrench: Wrench,
-  "shield-alert": ShieldAlert,
-};
-
-function ProposalCard({ p }: { p: AgentProposal }) {
-  return (
-    <div className="rounded-lg border p-4 space-y-3">
-      <div className="flex items-start justify-between gap-2">
-        <div className="space-y-1 flex-1 min-w-0">
-          <div className="flex items-center gap-2 flex-wrap">
-            <Badge variant="outline" className="text-[10px] shrink-0">{p.agentName}</Badge>
-            <Badge className={`text-[10px] ${urgencyColors[p.urgency]}`}>{p.urgency}</Badge>
-          </div>
-          <p className="font-medium text-sm leading-tight">{p.title}</p>
-        </div>
-        <div className="text-right shrink-0">
-          <div className="text-lg font-bold">{p.confidence}%</div>
-          <div className="text-[10px] text-muted-foreground">confidence</div>
-        </div>
-      </div>
-      <p className="text-xs text-muted-foreground leading-relaxed line-clamp-3">{p.explanation}</p>
-      <div className="flex items-center gap-2">
-        <Button size="sm" variant="default" className="h-7 text-xs gap-1">
-          <ThumbsUp className="h-3 w-3" /> Approve
-        </Button>
-        <Button size="sm" variant="outline" className="h-7 text-xs gap-1">
-          <ThumbsDown className="h-3 w-3" /> Reject
-        </Button>
-        <Button size="sm" variant="ghost" className="h-7 text-xs gap-1">
-          <Clock className="h-3 w-3" /> Defer
-        </Button>
-      </div>
-    </div>
-  );
-}
-
-function EventItem({ e }: { e: ActivityEvent }) {
-  const Icon = eventIcons[e.icon] || Activity;
-  const time = new Date(e.timestamp).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
-  return (
-    <div className="flex items-start gap-3 py-2">
-      <div className="mt-0.5 rounded-full bg-muted p-1.5">
-        <Icon className="h-3.5 w-3.5 text-muted-foreground" />
-      </div>
-      <div className="flex-1 min-w-0">
-        <p className="text-sm leading-tight">{e.message}</p>
-        <p className="text-xs text-muted-foreground mt-0.5">{time}</p>
-      </div>
-    </div>
-  );
-}
 
 export default function Dashboard() {
-  return (
-    <div className="page-shell p-6 space-y-6">
-      {/* Page header */}
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Operations Dashboard</h1>
-        <p className="text-sm text-muted-foreground">Real-time fleet overview - {new Date().toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}</p>
-      </div>
+  const [selectedProposalId, setSelectedProposalId] = useState<string | null>(agentProposals[0]?.id ?? null);
 
-      {/* KPI Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+  const pendingProposals = useMemo(
+    () => agentProposals.filter((proposal) => proposal.status === "pending"),
+    [],
+  );
+
+  const selectedProposal =
+    pendingProposals.find((proposal) => proposal.id === selectedProposalId) ?? pendingProposals[0] ?? null;
+
+  const activityItems: TimelineItem[] = activityFeed.slice(0, 8).map((event) => ({
+    id: event.id,
+    title: event.message,
+    time: new Date(event.timestamp).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" }),
+    tone:
+      event.type === "incident" || event.type === "alert"
+        ? "danger"
+        : event.type === "maintenance"
+          ? "warning"
+          : event.type === "trip_completed"
+            ? "success"
+            : "default",
+  }));
+
+  return (
+    <div className="page-shell">
+      <PageHeader
+        eyebrow="Mission Control"
+        title="Operations Command Center"
+        description="Monitor critical fleet signals, triage AI recommendations, and keep active deliveries on plan."
+        actions={
+          <>
+            <Button variant="outline">Export Snapshot</Button>
+            <Button>Open Fleet Map</Button>
+          </>
+        }
+      />
+
+      <section className="metric-grid">
         {kpiCards.map((kpi) => (
-          <Card key={kpi.label}>
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs text-muted-foreground font-medium">{kpi.label}</span>
-                <kpi.icon className={`h-4 w-4 ${kpi.color}`} />
+          <KpiTile
+            key={kpi.label}
+            label={kpi.label}
+            value={kpi.value}
+            detail={kpi.detail}
+            trend={kpi.trend}
+            tone={kpi.tone}
+            icon={kpi.icon}
+          />
+        ))}
+      </section>
+
+      <section className="workspace-grid with-inspector">
+        <div className="space-y-4">
+          <Card>
+            <CardHeader className="pb-3">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <CardTitle className="flex items-center gap-2 text-base">
+                    <Brain className="h-4 w-4 text-primary" />
+                    AI Proposal Queue
+                  </CardTitle>
+                  <CardDescription>{pendingProposals.length} recommendations waiting for operator action</CardDescription>
+                </div>
+                <Button size="sm" variant="outline">
+                  Open Queue
+                </Button>
               </div>
-              <div className="text-2xl font-bold">{kpi.value}</div>
-              <p className="text-[11px] text-muted-foreground mt-1">{kpi.sub}</p>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {pendingProposals.length === 0 ? (
+                <EmptyState
+                  title="No pending recommendations"
+                  description="All proposals are already resolved. New recommendations will appear here."
+                />
+              ) : (
+                pendingProposals.slice(0, 5).map((proposal) => (
+                  <button
+                    key={proposal.id}
+                    type="button"
+                    onClick={() => setSelectedProposalId(proposal.id)}
+                    className={`surface-raised w-full rounded-xl border p-3 text-left transition ${
+                      selectedProposal?.id === proposal.id ? "border-primary/45" : ""
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <StatusPill label={proposal.urgency} tone={urgencyTone[proposal.urgency]} />
+                      <span className="text-[11px] text-muted-foreground">{proposal.agentName}</span>
+                      <span className="ml-auto text-[11px] font-semibold text-muted-foreground">
+                        {proposal.confidence}% confidence
+                      </span>
+                    </div>
+                    <p className="mt-2 text-sm font-semibold">{proposal.title}</p>
+                    <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{proposal.explanation}</p>
+                  </button>
+                ))
+              )}
             </CardContent>
           </Card>
-        ))}
-      </div>
 
-      {/* Main grid */}
-      <div className="grid lg:grid-cols-3 gap-6">
-        {/* AI Proposals */}
-        <Card className="lg:col-span-2">
-          <CardHeader className="pb-3">
-            <div className="flex items-center gap-2">
-              <Brain className="h-5 w-5 text-fleet-info" />
-              <div>
-                <CardTitle className="text-base">AI Agent Proposals</CardTitle>
-                <CardDescription>Recommendations requiring your action</CardDescription>
-              </div>
+          <div className="grid gap-4 xl:grid-cols-2">
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base">Fuel Trend (7 days)</CardTitle>
+                <CardDescription>Litres consumed across operating units</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="h-[220px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={fuelConsumptionTrend}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                      <XAxis dataKey="day" tick={{ fontSize: 11 }} />
+                      <YAxis tick={{ fontSize: 11 }} />
+                      <Tooltip />
+                      <Line type="monotone" dataKey="litres" stroke="hsl(var(--chart-1))" strokeWidth={2.5} dot={false} />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base">Driver Score Distribution</CardTitle>
+                <CardDescription>Current behavior score spread</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="h-[220px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={driverScoreDistribution}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                      <XAxis dataKey="range" tick={{ fontSize: 11 }} />
+                      <YAxis tick={{ fontSize: 11 }} allowDecimals={false} />
+                      <Tooltip />
+                      <Bar dataKey="count" fill="hsl(var(--chart-2))" radius={[8, 8, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base">Live Operations Feed</CardTitle>
+              <CardDescription>Latest telemetry and compliance events</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <TimelineBlock items={activityItems} />
+            </CardContent>
+          </Card>
+        </div>
+
+        {selectedProposal ? (
+          <InspectorPanel
+            title={selectedProposal.title}
+            subtitle={`${selectedProposal.agentName} | ${new Date(selectedProposal.timestamp).toLocaleTimeString("en-GB", {
+              hour: "2-digit",
+              minute: "2-digit",
+            })}`}
+          >
+            <StatusPill label={selectedProposal.urgency} tone={urgencyTone[selectedProposal.urgency]} />
+            <div className="space-y-2">
+              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">Recommendation</p>
+              <p className="text-sm leading-relaxed">{selectedProposal.explanation}</p>
             </div>
-          </CardHeader>
-          <CardContent className="space-y-3 max-h-[420px] overflow-auto scrollbar-thin">
-            {agentProposals.filter(p => p.status === "pending").slice(0, 4).map(p => (
-              <ProposalCard key={p.id} p={p} />
-            ))}
-          </CardContent>
-        </Card>
-
-        {/* Activity Feed */}
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base">Activity Feed</CardTitle>
-            <CardDescription>Latest fleet events</CardDescription>
-          </CardHeader>
-          <CardContent className="divide-y max-h-[420px] overflow-auto scrollbar-thin">
-            {activityFeed.map(e => <EventItem key={e.id} e={e} />)}
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Charts */}
-      <div className="grid lg:grid-cols-3 gap-6">
-        {/* Fuel trend */}
-        <Card className="lg:col-span-2">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base">Fuel Consumption (7-day)</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ChartContainer config={{ litres: { label: "Litres", color: "hsl(var(--chart-1))" }, cost: { label: "Cost (GHS)", color: "hsl(var(--chart-3))" } }} className="h-[220px] w-full">
-              <BarChart data={fuelConsumptionTrend}>
-                <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-                <XAxis dataKey="day" className="text-xs" />
-                <YAxis className="text-xs" />
-                <ChartTooltip content={<ChartTooltipContent />} />
-                <Bar dataKey="litres" fill="var(--color-litres)" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ChartContainer>
-          </CardContent>
-        </Card>
-
-        {/* Driver score distribution */}
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base">Driver Score Distribution</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ChartContainer config={{ count: { label: "Drivers", color: "hsl(var(--chart-2))" } }} className="h-[220px] w-full">
-              <BarChart data={driverScoreDistribution}>
-                <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-                <XAxis dataKey="range" className="text-xs" />
-                <YAxis className="text-xs" allowDecimals={false} />
-                <ChartTooltip content={<ChartTooltipContent />} />
-                <Bar dataKey="count" fill="var(--color-count)" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ChartContainer>
-          </CardContent>
-        </Card>
-      </div>
+            <div className="surface-raised rounded-xl p-3 text-xs text-muted-foreground">
+              <p>Vehicle ref: {selectedProposal.vehicleId ?? "N/A"}</p>
+              <p>Driver ref: {selectedProposal.driverId ?? "N/A"}</p>
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              <Button size="sm">Approve</Button>
+              <Button size="sm" variant="outline">
+                Reject
+              </Button>
+              <Button size="sm" variant="secondary">
+                Defer
+              </Button>
+            </div>
+          </InspectorPanel>
+        ) : null}
+      </section>
     </div>
   );
 }
-

@@ -1,77 +1,139 @@
-﻿import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Brain, Fuel, Wrench, Navigation, Users, FileCheck, ThumbsUp, ThumbsDown, Clock } from "lucide-react";
+import { type ElementType, useMemo, useState } from "react";
+import {
+  Brain,
+  FileCheck,
+  Fuel,
+  Navigation,
+  ThumbsDown,
+  ThumbsUp,
+  Users,
+  Wrench,
+} from "lucide-react";
 import { agentProposals, type AgentType } from "@/data/mock-data";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { FilterChipBar, PageHeader, StatusPill } from "@/components/product";
 
-const agentInfo: Record<AgentType, { icon: React.ElementType; label: string; description: string }> = {
-  fuel: { icon: Fuel, label: "Fuel Anomaly Agent", description: "Monitors fuel consumption patterns and detects anomalies" },
-  maintenance: { icon: Wrench, label: "Predictive Maintenance", description: "Predicts vehicle failures and recommends maintenance windows" },
-  route: { icon: Navigation, label: "Route Intelligence", description: "Optimizes routes and manages delivery windows" },
-  behavior: { icon: Users, label: "Driver Behavior", description: "Builds behavioral profiles and generates coaching prompts" },
-  compliance: { icon: FileCheck, label: "Compliance Monitor", description: "Tracks document expiry and regulatory requirements" },
+const agentInfo: Record<
+  AgentType,
+  {
+    icon: ElementType;
+    label: string;
+    blurb: string;
+  }
+> = {
+  fuel: {
+    icon: Fuel,
+    label: "Fuel Anomaly Agent",
+    blurb: "Detects abnormal fuel usage and potential leakage or theft patterns.",
+  },
+  maintenance: {
+    icon: Wrench,
+    label: "Predictive Maintenance Agent",
+    blurb: "Forecasts component wear and schedules preventative interventions.",
+  },
+  route: {
+    icon: Navigation,
+    label: "Route Intelligence Agent",
+    blurb: "Suggests lane improvements and border-aware ETA optimization.",
+  },
+  behavior: {
+    icon: Users,
+    label: "Driver Behavior Agent",
+    blurb: "Tracks safety profile changes and coaching opportunities.",
+  },
+  compliance: {
+    icon: FileCheck,
+    label: "Compliance Agent",
+    blurb: "Monitors regulatory gaps and document validity.",
+  },
 };
 
-const urgencyColors: Record<string, string> = {
-  critical: "bg-fleet-danger text-fleet-danger-foreground",
-  warning: "bg-fleet-warning text-fleet-warning-foreground",
-  info: "bg-fleet-info text-fleet-info-foreground",
-};
+const urgencyTone = {
+  critical: "danger",
+  warning: "warning",
+  info: "info",
+} as const;
 
 export default function AIInsights() {
-  const byAgent = Object.entries(agentInfo).map(([type, info]) => ({
-    type: type as AgentType,
-    ...info,
-    proposals: agentProposals.filter(p => p.agentType === type),
-  }));
+  const [activeAgent, setActiveAgent] = useState<AgentType | "all">("all");
+
+  const grouped = useMemo(
+    () =>
+      Object.entries(agentInfo).map(([agentType, info]) => ({
+        key: agentType as AgentType,
+        ...info,
+        proposals: agentProposals.filter((proposal) => proposal.agentType === agentType),
+      })),
+    [],
+  );
+
+  const visible = activeAgent === "all" ? grouped : grouped.filter((group) => group.key === activeAgent);
 
   return (
-    <div className="page-shell p-6 space-y-6">
-      <div className="flex items-center gap-3">
-        <Brain className="h-7 w-7 text-fleet-info" />
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">AI Intelligence Hub</h1>
-          <p className="text-sm text-muted-foreground">Agent insights and proposals across your fleet</p>
-        </div>
-      </div>
+    <div className="page-shell">
+      <PageHeader
+        eyebrow="Autonomous Intelligence"
+        title="AI Insight Hub"
+        description="Review recommendation quality by specialist agent and clear pending actions from one workspace."
+      />
 
-      <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-4">
-        {byAgent.map(agent => (
-          <Card key={agent.type}>
+      <FilterChipBar
+        items={[
+          { key: "all", label: "all", count: agentProposals.length },
+          ...grouped.map((group) => ({ key: group.key, label: group.key, count: group.proposals.length })),
+        ]}
+        active={activeAgent}
+        onChange={(value) => setActiveAgent(value as AgentType | "all")}
+      />
+
+      <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-3">
+        {visible.map((group) => (
+          <Card key={group.key}>
             <CardHeader className="pb-2">
-              <div className="flex items-center gap-2">
-                <agent.icon className="h-5 w-5 text-fleet-info" />
-                <div>
-                  <CardTitle className="text-sm">{agent.label}</CardTitle>
-                  <CardDescription className="text-[10px]">{agent.description}</CardDescription>
-                </div>
-              </div>
+              <CardTitle className="flex items-center gap-2 text-base">
+                <group.icon className="h-4 w-4 text-primary" />
+                {group.label}
+              </CardTitle>
+              <p className="text-xs text-muted-foreground">{group.blurb}</p>
             </CardHeader>
             <CardContent className="space-y-3">
-              {agent.proposals.length === 0 ? (
-                <p className="text-xs text-muted-foreground py-4 text-center">No active proposals</p>
-              ) : (
-                agent.proposals.map(p => (
-                  <div key={p.id} className="rounded-md border p-3 space-y-2">
-                    <div className="flex items-center justify-between gap-2">
-                      <Badge className={`text-[10px] ${urgencyColors[p.urgency]}`}>{p.urgency}</Badge>
-                      <span className="text-xs font-semibold">{p.confidence}%</span>
-                    </div>
-                    <p className="text-xs font-medium">{p.title}</p>
-                    <p className="text-[10px] text-muted-foreground line-clamp-2">{p.explanation}</p>
-                    <div className="flex gap-1">
-                      <Button size="sm" variant="default" className="h-6 text-[10px] px-2"><ThumbsUp className="h-3 w-3" /></Button>
-                      <Button size="sm" variant="outline" className="h-6 text-[10px] px-2"><ThumbsDown className="h-3 w-3" /></Button>
-                      <Button size="sm" variant="ghost" className="h-6 text-[10px] px-2"><Clock className="h-3 w-3" /></Button>
-                    </div>
+              {group.proposals.slice(0, 4).map((proposal) => (
+                <div key={proposal.id} className="surface-raised rounded-xl border p-3">
+                  <div className="flex items-center gap-2">
+                    <StatusPill label={proposal.urgency} tone={urgencyTone[proposal.urgency]} className="capitalize" />
+                    <span className="ml-auto text-xs font-semibold text-muted-foreground">{proposal.confidence}%</span>
                   </div>
-                ))
-              )}
+                  <p className="mt-2 text-sm font-semibold">{proposal.title}</p>
+                  <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{proposal.explanation}</p>
+                  <div className="mt-3 flex gap-1">
+                    <Button size="sm"><ThumbsUp className="h-3.5 w-3.5" /></Button>
+                    <Button size="sm" variant="outline"><ThumbsDown className="h-3.5 w-3.5" /></Button>
+                  </div>
+                </div>
+              ))}
             </CardContent>
           </Card>
         ))}
       </div>
+
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="flex items-center gap-2 text-base">
+            <Brain className="h-4 w-4 text-primary" />
+            Model Confidence Summary
+          </CardTitle>
+          <p className="text-xs text-muted-foreground">Average confidence across all pending proposals</p>
+        </CardHeader>
+        <CardContent>
+          <div className="surface-raised rounded-xl p-4">
+            <p className="text-2xl font-semibold">
+              {Math.round(agentProposals.reduce((acc, proposal) => acc + proposal.confidence, 0) / agentProposals.length)}%
+            </p>
+            <p className="text-xs text-muted-foreground">Recommendation confidence mean</p>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
-

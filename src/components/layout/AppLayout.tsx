@@ -1,49 +1,88 @@
-﻿import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { Outlet, useLocation } from "react-router-dom";
+import { Bell, Command, Search } from "lucide-react";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "./AppSidebar";
-import { Outlet } from "react-router-dom";
-import { Bell, Search } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { alerts } from "@/data/mock-data";
+import { ThemeToggle } from "@/components/ThemeToggle";
+
+const routeMeta: Record<string, { title: string; subtitle: string }> = {
+  "/": { title: "Operations", subtitle: "Live control center" },
+  "/fleet-map": { title: "Fleet Map", subtitle: "Live geospatial tracking" },
+  "/trips": { title: "Trips", subtitle: "Dispatch execution and ETA control" },
+  "/dispatch": { title: "Dispatch Board", subtitle: "Workload and lane orchestration" },
+  "/vehicles": { title: "Vehicles", subtitle: "Asset status and utilization" },
+  "/drivers": { title: "Drivers", subtitle: "Compliance and behavior" },
+  "/fuel": { title: "Fuel", subtitle: "Consumption, spend, and anomaly watch" },
+  "/maintenance": { title: "Maintenance", subtitle: "Service risk and due workflows" },
+  "/ai-insights": { title: "AI Insights", subtitle: "Agent intelligence workspace" },
+  "/agent-queue": { title: "Agent Queue", subtitle: "Proposal triage" },
+  "/alerts": { title: "Alerts", subtitle: "Incident inbox" },
+  "/analytics": { title: "Analytics", subtitle: "Operational report library" },
+  "/compliance": { title: "Compliance", subtitle: "Regulatory readiness" },
+  "/costs": { title: "Cost Breakdown", subtitle: "Spend attribution" },
+};
 
 export function AppLayout() {
-  const unacknowledged = alerts.filter((a) => !a.acknowledged).length;
+  const location = useLocation();
+  const meta = routeMeta[location.pathname] ?? { title: "HyperFleet", subtitle: "Fleet intelligence" };
+  const unacknowledged = alerts.filter((alert) => !alert.acknowledged).length;
 
   return (
     <SidebarProvider>
-      <div className="app-root min-h-screen flex w-full">
+      <div className="app-shell flex w-full">
         <AppSidebar />
 
-        <div className="relative flex-1 flex flex-col min-w-0 overflow-hidden">
-          <div className="app-bg-orb app-bg-orb-a" aria-hidden="true" />
-          <div className="app-bg-orb app-bg-orb-b" aria-hidden="true" />
-          <div className="app-bg-orb app-bg-orb-c" aria-hidden="true" />
+        <div className="min-w-0 flex-1">
+          <header className="app-topbar flex h-[4.25rem] items-center gap-3 px-3 sm:px-5">
+            <SidebarTrigger className="h-9 w-9 rounded-lg border border-border/90 bg-background/70" />
 
-          <header className="app-topbar relative z-10 h-14 flex items-center justify-between px-3 sm:px-4 shrink-0">
-            <div className="flex items-center gap-2">
-              <SidebarTrigger className="h-8 w-8 rounded-lg border border-white/20 bg-white/10 text-slate-100 hover:bg-white/20" />
-              <div className="app-search hidden sm:flex items-center gap-2 px-3 py-1.5 text-sm text-slate-300 w-64">
-                <Search className="h-4 w-4 text-slate-300" />
-                <span>Search fleet...</span>
-              </div>
+            <div className="hidden min-w-0 sm:block">
+              <p className="truncate text-sm font-semibold">{meta.title}</p>
+              <p className="truncate text-xs text-muted-foreground">{meta.subtitle}</p>
             </div>
 
-            <div className="flex items-center gap-4">
-              <div className="relative rounded-lg border border-white/20 bg-white/10 px-2.5 py-2">
-                <Bell className="h-4 w-4 text-slate-200" />
-                {unacknowledged > 0 && (
-                  <Badge className="absolute -top-2 -right-2 h-4 w-4 p-0 flex items-center justify-center text-[10px] bg-fleet-danger text-fleet-danger-foreground border-0">
-                    {unacknowledged}
-                  </Badge>
-                )}
-              </div>
+            <div className="command-pill ml-auto hidden lg:flex">
+              <Search className="h-3.5 w-3.5" />
+              <span className="truncate">Search fleet, drivers, vehicles, trips...</span>
+              <span className="ml-auto rounded bg-muted px-1.5 py-0.5 text-[10px]">Ctrl+K</span>
+            </div>
 
-              <div className="h-8 w-8 rounded-full border border-white/30 bg-white/15 backdrop-blur-md flex items-center justify-center text-xs font-medium text-slate-100">
-                FM
+            <button
+              type="button"
+              className="surface-raised grid h-9 w-9 place-items-center rounded-lg"
+              aria-label="Command palette"
+              title="Command palette"
+            >
+              <Command className="h-4 w-4" />
+            </button>
+
+            <button
+              type="button"
+              className="surface-raised relative grid h-9 w-9 place-items-center rounded-lg"
+              aria-label="Alerts"
+              title="Alerts"
+            >
+              <Bell className="h-4 w-4" />
+              {unacknowledged > 0 ? (
+                <Badge className="absolute -right-2 -top-2 h-4 min-w-4 justify-center rounded-full border-0 bg-fleet-danger px-1 text-[10px] text-fleet-danger-foreground">
+                  {unacknowledged}
+                </Badge>
+              ) : null}
+            </button>
+
+            <ThemeToggle />
+
+            <div className="surface-raised hidden items-center gap-2 rounded-lg px-2.5 py-1.5 sm:flex">
+              <span className="grid h-7 w-7 place-items-center rounded-md bg-primary text-xs font-bold text-primary-foreground">FM</span>
+              <div className="text-xs leading-tight">
+                <p className="font-semibold">Fleet Manager</p>
+                <p className="text-muted-foreground">Operations</p>
               </div>
             </div>
           </header>
 
-          <main className="app-main relative z-10 flex-1 overflow-auto">
+          <main className="min-h-[calc(100svh-4.25rem)]">
             <Outlet />
           </main>
         </div>

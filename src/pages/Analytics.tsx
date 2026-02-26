@@ -1,37 +1,80 @@
-﻿import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Activity, BarChart3, Download, Fuel, Truck, Users } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Download, BarChart3, Truck, Users, Fuel, Activity } from "lucide-react";
+import { PageHeader, StatusPill } from "@/components/product";
 import { toast } from "sonner";
 
 const reports = [
-  { title: "Fuel Summary", description: "Weekly fuel consumption and cost analysis across the fleet", icon: Fuel },
-  { title: "Trip Performance", description: "On-time delivery rates, delays, and route efficiency", icon: BarChart3 },
-  { title: "Driver Behavior", description: "Behavior scores, coaching needs, and safety trends", icon: Users },
-  { title: "Fleet Health", description: "Vehicle health scores, maintenance compliance, and downtime", icon: Truck },
-  { title: "Cost Breakdown", description: "Operational costs by category, route, and vehicle", icon: Activity },
+  {
+    title: "Fuel Summary",
+    description: "Weekly fuel usage, region variance, and anomaly signals.",
+    icon: Fuel,
+    status: "ready",
+  },
+  {
+    title: "Trip Performance",
+    description: "On-time score, delay contribution, and route reliability.",
+    icon: BarChart3,
+    status: "ready",
+  },
+  {
+    title: "Driver Behavior",
+    description: "Score distribution, coaching targets, and safety trendline.",
+    icon: Users,
+    status: "ready",
+  },
+  {
+    title: "Fleet Health",
+    description: "Asset condition index and maintenance risk horizon.",
+    icon: Truck,
+    status: "refreshing",
+  },
+  {
+    title: "Cost Breakdown",
+    description: "Spend attribution by lane, category, and asset class.",
+    icon: Activity,
+    status: "ready",
+  },
 ];
 
 export default function Analytics() {
   return (
-    <div className="page-shell p-6 space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Reports & Analytics</h1>
-        <p className="text-sm text-muted-foreground">Pre-built reports and fleet analytics</p>
-      </div>
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {reports.map(r => (
-          <Card key={r.title} className="hover:shadow-md transition-shadow cursor-pointer">
+    <div className="page-shell">
+      <PageHeader
+        eyebrow="Reporting"
+        title="Analytics Library"
+        description="Generate operational reports with consistent narrative framing and export-ready summaries."
+      />
+
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        {reports.map((report) => (
+          <Card key={report.title} className="transition hover:-translate-y-0.5">
             <CardHeader className="pb-2">
-              <div className="flex items-center gap-2">
-                <r.icon className="h-5 w-5 text-fleet-info" />
-                <CardTitle className="text-sm">{r.title}</CardTitle>
+              <div className="flex items-center justify-between gap-2">
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <report.icon className="h-4 w-4 text-primary" />
+                  {report.title}
+                </CardTitle>
+                <StatusPill
+                  label={report.status}
+                  tone={report.status === "ready" ? "success" : "warning"}
+                  className="capitalize"
+                />
               </div>
             </CardHeader>
             <CardContent className="space-y-3">
-              <p className="text-xs text-muted-foreground">{r.description}</p>
-              <Button size="sm" variant="outline" className="h-7 text-xs gap-1" onClick={() => toast.success("Report downloaded")}>
-                <Download className="h-3 w-3" /> Export PDF
-              </Button>
+              <p className="text-sm text-muted-foreground">{report.description}</p>
+              <div className="grid grid-cols-2 gap-2">
+                <Button size="sm" onClick={() => toast.success(`${report.title} generated`)}>Open</Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => toast.success(`${report.title} downloaded`)}
+                >
+                  <Download className="mr-1 h-3.5 w-3.5" />
+                  Export
+                </Button>
+              </div>
             </CardContent>
           </Card>
         ))}
@@ -39,4 +82,3 @@ export default function Analytics() {
     </div>
   );
 }
-

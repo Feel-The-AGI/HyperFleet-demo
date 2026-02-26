@@ -1,13 +1,14 @@
-﻿import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, PieChart, Pie, Cell } from "recharts";
+import { useMemo } from "react";
+import { Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { KpiTile, PageHeader } from "@/components/product";
 
 const costByCategory = [
   { category: "Fuel", cost: 79450 },
   { category: "Maintenance", cost: 23400 },
-  { category: "Tyres", cost: 12800 },
+  { category: "Tires", cost: 12800 },
   { category: "Insurance", cost: 8500 },
-  { category: "Tolls & Fees", cost: 5200 },
+  { category: "Tolls", cost: 5200 },
   { category: "Permits", cost: 3100 },
 ];
 
@@ -19,50 +20,94 @@ const costByRoute = [
   { route: "Lome-Cotonou", cost: 12300 },
 ];
 
-const COLORS = ["hsl(210, 80%, 55%)", "hsl(152, 60%, 40%)", "hsl(36, 90%, 50%)", "hsl(280, 60%, 55%)", "hsl(0, 72%, 51%)", "hsl(180, 50%, 45%)"];
+const pieColors = ["hsl(var(--chart-1))", "hsl(var(--chart-2))", "hsl(var(--chart-3))", "hsl(var(--chart-4))", "hsl(var(--chart-5))", "#10b981"];
 
 export default function CostBreakdown() {
-  const total = costByCategory.reduce((a, c) => a + c.cost, 0);
+  const total = useMemo(() => costByCategory.reduce((acc, item) => acc + item.cost, 0), []);
 
   return (
-    <div className="page-shell p-6 space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Cost Breakdown</h1>
-        <p className="text-sm text-muted-foreground">Operational cost analysis - GHS {total.toLocaleString()} total this month</p>
-      </div>
+    <div className="page-shell">
+      <PageHeader
+        eyebrow="Finance Intelligence"
+        title="Cost Breakdown"
+        description="Analyze operational spend by category and route to identify priority optimization targets."
+      />
 
-      <div className="grid lg:grid-cols-2 gap-6">
+      <section className="metric-grid">
+        <KpiTile label="Total Spend" value={`GHS ${total.toLocaleString()}`} detail="Current month" tone="warning" />
+        <KpiTile
+          label="Largest Category"
+          value={costByCategory[0].category}
+          detail={`GHS ${costByCategory[0].cost.toLocaleString()}`}
+          tone="warning"
+        />
+        <KpiTile
+          label="Highest Route Cost"
+          value={costByRoute[0].route}
+          detail={`GHS ${costByRoute[0].cost.toLocaleString()}`}
+          tone="danger"
+        />
+      </section>
+
+      <div className="grid gap-4 xl:grid-cols-2">
         <Card>
-          <CardHeader className="pb-2"><CardTitle className="text-base">Cost by Category</CardTitle></CardHeader>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base">Cost by Category</CardTitle>
+          </CardHeader>
           <CardContent>
-            <ChartContainer config={{ cost: { label: "Cost (GHS)", color: "hsl(var(--chart-1))" } }} className="h-[260px] w-full">
-              <BarChart data={costByCategory} layout="vertical">
-                <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-                <XAxis type="number" />
-                <YAxis type="category" dataKey="category" width={80} className="text-xs" />
-                <ChartTooltip content={<ChartTooltipContent />} />
-                <Bar dataKey="cost" fill="var(--color-cost)" radius={[0, 4, 4, 0]} />
-              </BarChart>
-            </ChartContainer>
+            <div className="h-[280px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={costByCategory} layout="vertical" margin={{ left: 8, right: 16 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                  <XAxis type="number" tick={{ fontSize: 11 }} />
+                  <YAxis type="category" dataKey="category" tick={{ fontSize: 11 }} width={92} />
+                  <Tooltip />
+                  <Bar dataKey="cost" fill="hsl(var(--chart-1))" radius={[0, 8, 8, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader className="pb-2"><CardTitle className="text-base">Cost by Route</CardTitle></CardHeader>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base">Cost Composition</CardTitle>
+          </CardHeader>
           <CardContent>
-            <ChartContainer config={{ cost: { label: "Cost (GHS)", color: "hsl(var(--chart-2))" } }} className="h-[260px] w-full">
+            <div className="h-[280px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie data={costByCategory} dataKey="cost" nameKey="category" cx="50%" cy="50%" outerRadius={96}>
+                    {costByCategory.map((entry, index) => (
+                      <Cell key={entry.category} fill={pieColors[index % pieColors.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base">Route Cost Distribution</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="h-[260px]">
+            <ResponsiveContainer width="100%" height="100%">
               <BarChart data={costByRoute}>
-                <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-                <XAxis dataKey="route" className="text-[10px]" />
-                <YAxis className="text-xs" />
-                <ChartTooltip content={<ChartTooltipContent />} />
-                <Bar dataKey="cost" fill="var(--color-cost)" radius={[4, 4, 0, 0]} />
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                <XAxis dataKey="route" tick={{ fontSize: 11 }} />
+                <YAxis tick={{ fontSize: 11 }} />
+                <Tooltip />
+                <Bar dataKey="cost" fill="hsl(var(--chart-2))" radius={[8, 8, 0, 0]} />
               </BarChart>
-            </ChartContainer>
-          </CardContent>
-        </Card>
-      </div>
+            </ResponsiveContainer>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
-

@@ -1,13 +1,40 @@
-﻿import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { vehicles, getDriverById, type Vehicle, type VehicleStatus } from "@/data/mock-data";
-import { Clock3, Fuel as FuelIcon, Gauge, Navigation, Radar, Route, ShieldCheck, X } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { useTheme } from "next-themes";
 import L, { type DivIcon } from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { useEffect, useMemo, useState } from "react";
-import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
+import "leaflet.markercluster/dist/MarkerCluster.css";
+import "leaflet.markercluster/dist/MarkerCluster.Default.css";
+import "react-leaflet-markercluster/dist/styles.min.css";
+import {
+  Clock3,
+  Crosshair,
+  Fuel,
+  Gauge,
+  Navigation,
+  Pause,
+  Play,
+  Route,
+  ShieldCheck,
+  SlidersHorizontal,
+  Truck,
+} from "lucide-react";
+import {
+  MapContainer,
+  Marker,
+  Popup,
+  Polyline,
+  TileLayer,
+  useMap,
+} from "react-leaflet";
+import MarkerClusterGroup from "react-leaflet-markercluster";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { FilterChipBar, InspectorPanel, PageHeader, StatusPill } from "@/components/product";
+import { getDriverById, vehicles, type Vehicle, type VehicleStatus } from "@/data/mock-data";
+import type { FleetMapViewState } from "@/types/workspace";
 
 const STREAM_INTERVAL_MS = 3000;
+const HISTORY_LIMIT = 14;
 
 const mapBounds = {
   north: 10.3,
@@ -16,33 +43,28 @@ const mapBounds = {
   west: -2.6,
 };
 
-const statusDotColors: Record<VehicleStatus, string> = {
+const statusColorClass: Record<VehicleStatus, string> = {
   moving: "bg-fleet-success",
   idle: "bg-fleet-warning",
   stopped: "bg-fleet-danger",
   offline: "bg-muted-foreground",
 };
 
-const statusHexColors: Record<VehicleStatus, string> = {
-  moving: "#22c55e",
+const statusHex: Record<VehicleStatus, string> = {
+  moving: "#10b981",
   idle: "#f59e0b",
   stopped: "#ef4444",
   offline: "#64748b",
 };
 
-const statusLabels: Record<VehicleStatus, string> = {
-  moving: "Moving",
-  idle: "Idle",
-  stopped: "Stopped",
-  offline: "Offline",
+const statusTone: Record<VehicleStatus, "success" | "warning" | "danger" | "neutral"> = {
+  moving: "success",
+  idle: "warning",
+  stopped: "danger",
+  offline: "neutral",
 };
 
-const statusBadge: Record<VehicleStatus, string> = {
-  moving: "bg-fleet-success text-fleet-success-foreground",
-  idle: "bg-fleet-warning text-fleet-warning-foreground",
-  stopped: "bg-fleet-danger text-fleet-danger-foreground",
-  offline: "bg-muted text-muted-foreground",
-};
+const statusOrder: Array<VehicleStatus | "all"> = ["all", "moving", "idle", "stopped", "offline"];
 
 function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
@@ -53,14 +75,6 @@ function normalizeHeading(heading: number) {
   return normalized < 0 ? normalized + 360 : normalized;
 }
 
-function vehicleGlyph(type: string) {
-  const lower = type.toLowerCase();
-  if (lower.includes("pickup")) return "1F6FB";
-  if (lower.includes("van")) return "1F690";
-  if (lower.includes("truck")) return "1F69A";
-  return "1F69A";
-}
-
 function vehicleImageByType(type: string) {
   const lower = type.toLowerCase();
   if (lower.includes("pickup")) return "/vehicle-types/pickup.svg";
@@ -69,22 +83,30 @@ function vehicleImageByType(type: string) {
   return "/vehicle-types/utility.svg";
 }
 
+function vehicleAbbreviation(type: string) {
+  const lower = type.toLowerCase();
+  if (lower.includes("pickup")) return "PK";
+  if (lower.includes("van")) return "VN";
+  if (lower.includes("light")) return "LT";
+  if (lower.includes("medium")) return "MT";
+  return "HT";
+}
+
 function createMarkerIcon(vehicle: Vehicle): DivIcon {
-  const color = statusHexColors[vehicle.status];
   const pulse =
     vehicle.status === "moving"
-      ? `<span class="fleet-marker-pulse" style="background:${color}44"></span>`
+      ? `<span class="fleet-marker-pulse" style="background:${statusHex[vehicle.status]}44"></span>`
       : "";
 
   return L.divIcon({
     className: "fleet-marker-wrapper",
-    iconSize: [36, 36],
-    iconAnchor: [18, 18],
+    iconSize: [38, 38],
+    iconAnchor: [19, 19],
     popupAnchor: [0, -14],
     html: `
-      <div class="fleet-marker" style="--fleet-marker-color:${color}">
+      <div class="fleet-marker" style="--fleet-marker-color:${statusHex[vehicle.status]}">
         ${pulse}
-        <span class="fleet-marker-glyph">&#x${vehicleGlyph(vehicle.type)};</span>
+        <span style="font-weight:700;font-size:11px;letter-spacing:0.03em;color:white">${vehicleAbbreviation(vehicle.type)}</span>
       </div>
     `,
   });
@@ -123,33 +145,50 @@ function FitToMarkers({ positions, fitToken }: { positions: Array<[number, numbe
   useEffect(() => {
     if (!positions.length) return;
     const bounds = L.latLngBounds(positions);
-    map.fitBounds(bounds.pad(0.2), { animate: true, duration: 0.8, maxZoom: 10 });
+    map.fitBounds(bounds.pad(0.2), { animate: true, duration: 0.7, maxZoom: 11 });
   }, [fitToken, map, positions]);
 
   return null;
 }
 
-function FocusOnSelected({ vehicle }: { vehicle: Vehicle | null }) {
+function FocusSelected({
+  selected,
+  followSelected,
+}: {
+  selected: Vehicle | null;
+  followSelected: boolean;
+}) {
   const map = useMap();
-  const selectedId = vehicle?.id;
 
   useEffect(() => {
-    if (!vehicle) return;
-    map.flyTo([vehicle.lastLocation.lat, vehicle.lastLocation.lng], Math.max(map.getZoom(), 9), { duration: 0.8 });
-  }, [map, selectedId]);
+    if (!selected || !followSelected) return;
+    map.flyTo([selected.lastLocation.lat, selected.lastLocation.lng], Math.max(map.getZoom(), 9), {
+      duration: 0.6,
+    });
+  }, [followSelected, map, selected?.id, selected?.lastLocation.lat, selected?.lastLocation.lng]);
 
   return null;
 }
 
 export default function FleetMap() {
-  const [filter, setFilter] = useState<VehicleStatus | "all">("all");
+  const { resolvedTheme } = useTheme();
   const [liveVehicles, setLiveVehicles] = useState<Vehicle[]>(vehicles);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [historyFrames, setHistoryFrames] = useState<Vehicle[][]>([vehicles]);
+  const [selectedId, setSelectedId] = useState<string | null>(vehicles[0]?.id ?? null);
   const [lastStreamAt, setLastStreamAt] = useState<Date>(new Date());
   const [fitToken, setFitToken] = useState(1);
   const [fitPositions, setFitPositions] = useState<Array<[number, number]>>(
     vehicles.map((vehicle) => [vehicle.lastLocation.lat, vehicle.lastLocation.lng]),
   );
+
+  const [viewState, setViewState] = useState<FleetMapViewState>({
+    filter: "all",
+    mapStyle: "streets",
+    playbackMode: false,
+    playbackIndex: 0,
+    followSelected: true,
+    showTrails: true,
+  });
 
   useEffect(() => {
     const timer = window.setInterval(() => {
@@ -160,34 +199,65 @@ export default function FleetMap() {
     return () => window.clearInterval(timer);
   }, []);
 
+  useEffect(() => {
+    setHistoryFrames((prev) => {
+      const next = [...prev, liveVehicles].slice(-HISTORY_LIMIT);
+      if (!viewState.playbackMode) {
+        setViewState((current) => ({ ...current, playbackIndex: next.length - 1 }));
+      }
+      return next;
+    });
+  }, [liveVehicles, viewState.playbackMode]);
+
+  const shownVehicles = useMemo(() => {
+    if (!viewState.playbackMode) return liveVehicles;
+    return historyFrames[viewState.playbackIndex] ?? liveVehicles;
+  }, [historyFrames, liveVehicles, viewState.playbackIndex, viewState.playbackMode]);
+
   const counts = useMemo(
     () => ({
-      all: liveVehicles.length,
-      moving: liveVehicles.filter((vehicle) => vehicle.status === "moving").length,
-      idle: liveVehicles.filter((vehicle) => vehicle.status === "idle").length,
-      stopped: liveVehicles.filter((vehicle) => vehicle.status === "stopped").length,
-      offline: liveVehicles.filter((vehicle) => vehicle.status === "offline").length,
+      all: shownVehicles.length,
+      moving: shownVehicles.filter((vehicle) => vehicle.status === "moving").length,
+      idle: shownVehicles.filter((vehicle) => vehicle.status === "idle").length,
+      stopped: shownVehicles.filter((vehicle) => vehicle.status === "stopped").length,
+      offline: shownVehicles.filter((vehicle) => vehicle.status === "offline").length,
     }),
-    [liveVehicles],
+    [shownVehicles],
   );
 
   const filteredVehicles = useMemo(
-    () => (filter === "all" ? liveVehicles : liveVehicles.filter((vehicle) => vehicle.status === filter)),
-    [filter, liveVehicles],
+    () =>
+      viewState.filter === "all"
+        ? shownVehicles
+        : shownVehicles.filter((vehicle) => vehicle.status === viewState.filter),
+    [shownVehicles, viewState.filter],
   );
 
   const selected = useMemo(
-    () => liveVehicles.find((vehicle) => vehicle.id === selectedId) ?? null,
-    [liveVehicles, selectedId],
+    () => filteredVehicles.find((vehicle) => vehicle.id === selectedId) ?? null,
+    [filteredVehicles, selectedId],
   );
 
   const driver = selected?.assignedDriver ? getDriverById(selected.assignedDriver) : null;
 
-  useEffect(() => {
-    if (!selectedId) return;
-    const existsInFilter = filteredVehicles.some((vehicle) => vehicle.id === selectedId);
-    if (!existsInFilter) setSelectedId(null);
-  }, [filteredVehicles, selectedId]);
+  const trailPaths = useMemo(() => {
+    if (!viewState.showTrails) return [] as Array<{ id: string; points: Array<[number, number]> }>;
+    const frames = viewState.playbackMode
+      ? historyFrames.slice(0, viewState.playbackIndex + 1)
+      : historyFrames;
+
+    return filteredVehicles
+      .filter((vehicle) => vehicle.status === "moving")
+      .map((vehicle) => {
+        const points = frames
+          .map((frame) => frame.find((entry) => entry.id === vehicle.id))
+          .filter((entry): entry is Vehicle => Boolean(entry))
+          .map((entry) => [entry.lastLocation.lat, entry.lastLocation.lng] as [number, number]);
+
+        return { id: vehicle.id, points };
+      })
+      .filter((trail) => trail.points.length > 1);
+  }, [filteredVehicles, historyFrames, viewState.playbackIndex, viewState.playbackMode, viewState.showTrails]);
 
   const requestMapFit = (targetVehicles: Vehicle[]) => {
     if (!targetVehicles.length) return;
@@ -195,75 +265,146 @@ export default function FleetMap() {
     setFitToken((value) => value + 1);
   };
 
+  useEffect(() => {
+    if (!selectedId) return;
+    if (!filteredVehicles.some((vehicle) => vehicle.id === selectedId)) {
+      setSelectedId(filteredVehicles[0]?.id ?? null);
+    }
+  }, [filteredVehicles, selectedId]);
+
+  const tileConfig =
+    viewState.mapStyle === "terrain"
+      ? {
+          url: "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
+          attribution: "Map data: OpenStreetMap contributors, SRTM",
+        }
+      : resolvedTheme === "dark"
+        ? {
+            url: "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+            attribution: "Map data: OpenStreetMap contributors and CARTO",
+          }
+        : {
+            url: "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+            attribution: "Map data: OpenStreetMap contributors and CARTO",
+          };
+
   return (
-    <div className="liquid-shell relative h-[calc(100vh-3.5rem)] overflow-hidden p-3 sm:p-4">
-      <div className="liquid-orb liquid-orb-one" aria-hidden="true" />
-      <div className="liquid-orb liquid-orb-two" aria-hidden="true" />
-      <div className="liquid-orb liquid-orb-three" aria-hidden="true" />
+    <div className="page-shell">
+      <PageHeader
+        eyebrow="Live Tracking"
+        title="Fleet Interactive Map"
+        description="Track moving units in real time, inspect telemetry, and replay recent movement windows."
+        actions={
+          <>
+            <Badge variant="outline" className="gap-1.5">
+              <Clock3 className="h-3.5 w-3.5" />
+              {lastStreamAt.toLocaleTimeString("en-GB", {
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+              })}
+            </Badge>
+            <Button size="sm" variant="outline" onClick={() => requestMapFit(filteredVehicles)}>
+              <Crosshair className="mr-1 h-3.5 w-3.5" />
+              Fit View
+            </Button>
+          </>
+        }
+      />
 
-      <div className="relative z-10 flex h-full min-h-0 flex-col gap-3">
-        <div className="liquid-glass-panel flex items-center justify-between gap-3 px-3 py-2 sm:px-4 sm:py-3 shrink-0">
-          <div className="flex items-center gap-2 overflow-x-auto">
-            {(["all", "moving", "idle", "stopped", "offline"] as const).map((statusKey) => (
-              <button
-                key={statusKey}
-                aria-pressed={filter === statusKey}
-                onClick={() => {
-                  setFilter(statusKey);
-                  const target =
-                    statusKey === "all"
-                      ? liveVehicles
-                      : liveVehicles.filter((vehicle) => vehicle.status === statusKey);
-                  requestMapFit(target);
-                }}
-                className={`liquid-filter-pill ${
-                  filter === statusKey ? "liquid-filter-pill-active" : "liquid-filter-pill-idle"
-                }`}
-              >
-                {statusKey !== "all" && <span className={`h-2 w-2 rounded-full ${statusDotColors[statusKey]}`} />}
-                <span className="capitalize">{statusKey}</span>
-                <span className="ml-1 text-[10px]">({counts[statusKey]})</span>
-              </button>
-            ))}
-          </div>
+      <div className="surface-raised rounded-2xl p-3">
+        <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
+          <FilterChipBar
+            items={statusOrder.map((status) => ({
+              key: status,
+              label: status === "all" ? "all" : status,
+              count: counts[status],
+              colorClassName: status === "all" ? undefined : statusColorClass[status],
+            }))}
+            active={viewState.filter}
+            onChange={(value) => {
+              const nextFilter = value as VehicleStatus | "all";
+              setViewState((current) => ({ ...current, filter: nextFilter }));
+              const target = nextFilter === "all" ? shownVehicles : shownVehicles.filter((item) => item.status === nextFilter);
+              requestMapFit(target);
+            }}
+          />
 
-          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-            <div className="hidden md:flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-xs text-slate-100">
-              <span className="relative flex h-2.5 w-2.5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-fleet-success opacity-75" />
-                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-fleet-success" />
-              </span>
-              <span>Streaming live</span>
-              <span className="text-[11px] text-slate-200/90">
-                {lastStreamAt.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", second: "2-digit" })}
-              </span>
-            </div>
-
-            <Button size="sm" className="liquid-action-btn h-8 gap-1.5" onClick={() => requestMapFit(filteredVehicles)}>
-              <Radar className="h-3.5 w-3.5" />
-              View Interactive Map
+          <div className="flex flex-wrap items-center gap-2">
+            <Button
+              size="sm"
+              variant={viewState.playbackMode ? "default" : "outline"}
+              onClick={() => setViewState((current) => ({ ...current, playbackMode: !current.playbackMode }))}
+            >
+              {viewState.playbackMode ? <Pause className="mr-1 h-3.5 w-3.5" /> : <Play className="mr-1 h-3.5 w-3.5" />}
+              {viewState.playbackMode ? "Live Mode" : "Replay Mode"}
+            </Button>
+            <Button
+              size="sm"
+              variant={viewState.showTrails ? "default" : "outline"}
+              onClick={() => setViewState((current) => ({ ...current, showTrails: !current.showTrails }))}
+            >
+              <Route className="mr-1 h-3.5 w-3.5" />
+              Trails
+            </Button>
+            <Button
+              size="sm"
+              variant={viewState.followSelected ? "default" : "outline"}
+              onClick={() => setViewState((current) => ({ ...current, followSelected: !current.followSelected }))}
+            >
+              <Navigation className="mr-1 h-3.5 w-3.5" />
+              Follow Selected
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() =>
+                setViewState((current) => ({
+                  ...current,
+                  mapStyle: current.mapStyle === "streets" ? "terrain" : "streets",
+                }))
+              }
+            >
+              <SlidersHorizontal className="mr-1 h-3.5 w-3.5" />
+              {viewState.mapStyle === "streets" ? "Terrain" : "Streets"}
             </Button>
           </div>
         </div>
 
-        <div className="liquid-map-frame flex-1 flex relative min-h-0 overflow-hidden">
-          <div className="flex-1 min-h-0">
-            <MapContainer
-              center={[6.2, 0.2]}
-              zoom={7}
-              minZoom={5}
-              maxZoom={14}
-              scrollWheelZoom
-              className="liquid-map-surface h-full w-full z-0"
-            >
-              <TileLayer
-                url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
-                attribution="&copy; OpenStreetMap contributors &copy; CARTO"
+        {viewState.playbackMode ? (
+          <div className="mt-3 flex items-center gap-3">
+            <span className="text-xs font-semibold text-muted-foreground">Playback</span>
+            <input
+              type="range"
+              min={0}
+              max={Math.max(historyFrames.length - 1, 0)}
+              value={viewState.playbackIndex}
+              className="h-2 w-full accent-[hsl(var(--primary))]"
+              onChange={(event) =>
+                setViewState((current) => ({ ...current, playbackIndex: Number(event.target.value) }))
+              }
+            />
+            <span className="text-xs text-muted-foreground">{viewState.playbackIndex + 1}/{historyFrames.length}</span>
+          </div>
+        ) : null}
+      </div>
+
+      <section className="workspace-grid with-inspector">
+        <div className="map-shell h-[calc(100svh-18rem)] min-h-[34rem]">
+          <MapContainer center={[6.2, 0.2]} zoom={7} minZoom={5} maxZoom={14} scrollWheelZoom className="h-full w-full">
+            <TileLayer url={tileConfig.url} attribution={tileConfig.attribution} />
+            <FitToMarkers positions={fitPositions} fitToken={fitToken} />
+            <FocusSelected selected={selected} followSelected={viewState.followSelected} />
+
+            {trailPaths.map((trail) => (
+              <Polyline
+                key={trail.id}
+                positions={trail.points}
+                pathOptions={{ color: "#0ea5a4", weight: 2, opacity: 0.7 }}
               />
+            ))}
 
-              <FitToMarkers positions={fitPositions} fitToken={fitToken} />
-              <FocusOnSelected vehicle={selected} />
-
+            <MarkerClusterGroup chunkedLoading showCoverageOnHover={false}>
               {filteredVehicles.map((vehicle) => (
                 <Marker
                   key={vehicle.id}
@@ -276,116 +417,114 @@ export default function FleetMap() {
                       <div className="flex items-center gap-2">
                         <img
                           src={vehicleImageByType(vehicle.type)}
-                          alt={`${vehicle.type} vehicle`}
-                          className="h-10 w-16 rounded-md border border-white/40 bg-white/50 object-contain p-1"
+                          alt={`${vehicle.type} view`}
+                          className="h-10 w-16 rounded-md border bg-muted/30 object-contain p-1"
                         />
                         <div>
-                          <p className="text-sm font-semibold text-slate-900">{vehicle.registration}</p>
-                          <p className="text-xs text-slate-600">{vehicle.make} {vehicle.model}</p>
+                          <p className="text-sm font-semibold">{vehicle.registration}</p>
+                          <p className="text-xs text-muted-foreground">{vehicle.make} {vehicle.model}</p>
                         </div>
                       </div>
-                      <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-slate-800">
-                        <p>Status: <span className="font-medium">{statusLabels[vehicle.status]}</span></p>
-                        <p>Speed: <span className="font-medium">{vehicle.speed} km/h</span></p>
-                        <p>Fuel: <span className="font-medium">{vehicle.fuelLevel}%</span></p>
-                        <p>Health: <span className="font-medium">{vehicle.healthScore}/100</span></p>
+                      <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-xs">
+                        <p>Status: <span className="font-semibold capitalize">{vehicle.status}</span></p>
+                        <p>Speed: <span className="font-semibold">{vehicle.speed} km/h</span></p>
+                        <p>Fuel: <span className="font-semibold">{vehicle.fuelLevel}%</span></p>
+                        <p>Health: <span className="font-semibold">{vehicle.healthScore}/100</span></p>
                       </div>
-                      <p className="text-xs text-slate-600">
+                      <p className="text-xs text-muted-foreground">
                         {vehicle.lastLocation.label} ({vehicle.lastLocation.lat.toFixed(4)}, {vehicle.lastLocation.lng.toFixed(4)})
                       </p>
                     </div>
                   </Popup>
                 </Marker>
               ))}
-            </MapContainer>
-          </div>
+            </MarkerClusterGroup>
+          </MapContainer>
+        </div>
 
-          {selected && (
-            <div className="liquid-detail-panel absolute md:static right-2 top-2 bottom-2 z-[500] w-[22rem] max-w-[94vw] overflow-auto shrink-0">
-              <div className="p-4 border-b border-white/20 flex items-center justify-between">
-                <h3 className="font-semibold text-sm text-slate-100">{selected.registration}</h3>
-                <button onClick={() => setSelectedId(null)} className="text-slate-300 hover:text-white">
-                  <X className="h-4 w-4" />
-                </button>
+        {selected ? (
+          <InspectorPanel title={selected.registration} subtitle={`${selected.make} ${selected.model}`}>
+            <img
+              src={vehicleImageByType(selected.type)}
+              alt={`${selected.type} profile`}
+              className="h-28 w-full rounded-xl border bg-muted/30 object-contain p-2"
+            />
+
+            <div className="flex items-center justify-between">
+              <StatusPill label={selected.status} tone={statusTone[selected.status]} />
+              <p className="text-xs text-muted-foreground">{selected.type}</p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2">
+              <div className="surface-raised rounded-xl p-2.5">
+                <p className="text-[11px] text-muted-foreground">Speed</p>
+                <p className="mt-1 flex items-center gap-1 text-sm font-semibold">
+                  <Gauge className="h-3.5 w-3.5 text-primary" />
+                  {selected.speed} km/h
+                </p>
               </div>
-
-              <div className="p-4 space-y-4">
-                <img
-                  src={vehicleImageByType(selected.type)}
-                  alt={`${selected.type} image`}
-                  className="h-28 w-full rounded-xl border border-white/20 bg-white/10 object-contain p-2"
-                />
-
-                <div className="flex items-center justify-between gap-2">
-                  <Badge className={statusBadge[selected.status]}>{statusLabels[selected.status]}</Badge>
-                  <span className="text-xs text-slate-200">{selected.type}</span>
-                </div>
-
-                <div>
-                  <p className="text-sm font-medium text-slate-100">{selected.make} {selected.model}</p>
-                  <p className="text-xs text-slate-300">Year {selected.year} | Odometer {selected.odometer.toLocaleString()} km</p>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-1 text-[10px] text-slate-300"><Gauge className="h-3 w-3" /> Speed</div>
-                    <p className="text-sm font-semibold text-white">{selected.speed} km/h</p>
-                  </div>
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-1 text-[10px] text-slate-300"><Navigation className="h-3 w-3" /> Heading</div>
-                    <p className="text-sm font-semibold text-white">{selected.heading} deg</p>
-                  </div>
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-1 text-[10px] text-slate-300"><FuelIcon className="h-3 w-3" /> Fuel</div>
-                    <p className="text-sm font-semibold text-white">{selected.fuelLevel}%</p>
-                  </div>
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-1 text-[10px] text-slate-300"><ShieldCheck className="h-3 w-3" /> Health</div>
-                    <p className="text-sm font-semibold text-white">{selected.healthScore}/100</p>
-                  </div>
-                </div>
-
-                <div className="border-t border-white/20 pt-3 space-y-2">
-                  <p className="text-[10px] uppercase tracking-wide text-slate-300">Live location</p>
-                  <p className="text-sm text-slate-100">{selected.lastLocation.label}</p>
-                  <p className="text-[11px] text-slate-300">
-                    {selected.lastLocation.lat.toFixed(5)}, {selected.lastLocation.lng.toFixed(5)}
-                  </p>
-                </div>
-
-                <div className="border-t border-white/20 pt-3 space-y-1">
-                  <p className="text-[10px] uppercase tracking-wide text-slate-300">Telemetry stream</p>
-                  <p className="text-xs text-slate-300 flex items-center gap-1.5">
-                    <Clock3 className="h-3 w-3" />
-                    Last update {lastStreamAt.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", second: "2-digit" })}
-                  </p>
-                </div>
-
-                {driver ? (
-                  <div className="border-t border-white/20 pt-3">
-                    <p className="text-[10px] uppercase tracking-wide text-slate-300 mb-2">Assigned driver</p>
-                    <div className="flex items-center gap-2">
-                      <div className="h-9 w-9 rounded-full bg-white/20 border border-white/30 flex items-center justify-center text-xs font-medium text-white">{driver.avatar}</div>
-                      <div className="min-w-0">
-                        <p className="text-sm font-medium text-slate-100">{driver.name}</p>
-                        <p className="text-[11px] text-slate-300">{driver.phone}</p>
-                      </div>
-                    </div>
-                    <p className="text-[11px] text-slate-300 mt-2">Behavior score: {driver.behaviorScore}/100</p>
-                  </div>
-                ) : (
-                  <div className="border-t border-white/20 pt-3 text-xs text-slate-300">No driver assigned.</div>
-                )}
-
-                <div className="border-t border-white/20 pt-3 text-xs text-slate-300 flex items-center gap-1.5">
-                  <Route className="h-3.5 w-3.5" />
-                  Marker remains clickable on map for continuous tracking.
-                </div>
+              <div className="surface-raised rounded-xl p-2.5">
+                <p className="text-[11px] text-muted-foreground">Heading</p>
+                <p className="mt-1 flex items-center gap-1 text-sm font-semibold">
+                  <Navigation className="h-3.5 w-3.5 text-primary" />
+                  {selected.heading} deg
+                </p>
+              </div>
+              <div className="surface-raised rounded-xl p-2.5">
+                <p className="text-[11px] text-muted-foreground">Fuel</p>
+                <p className="mt-1 flex items-center gap-1 text-sm font-semibold">
+                  <Fuel className="h-3.5 w-3.5 text-primary" />
+                  {selected.fuelLevel}%
+                </p>
+              </div>
+              <div className="surface-raised rounded-xl p-2.5">
+                <p className="text-[11px] text-muted-foreground">Health</p>
+                <p className="mt-1 flex items-center gap-1 text-sm font-semibold">
+                  <ShieldCheck className="h-3.5 w-3.5 text-primary" />
+                  {selected.healthScore}/100
+                </p>
               </div>
             </div>
-          )}
-        </div>
-      </div>
+
+            <div className="surface-raised rounded-xl p-3">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">Live Position</p>
+              <p className="mt-1 text-sm">{selected.lastLocation.label}</p>
+              <p className="text-xs text-muted-foreground">
+                {selected.lastLocation.lat.toFixed(5)}, {selected.lastLocation.lng.toFixed(5)}
+              </p>
+            </div>
+
+            <div className="surface-raised rounded-xl p-3 text-sm">
+              <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">Assigned Driver</p>
+              {driver ? (
+                <div className="flex items-center gap-2">
+                  <span className="grid h-8 w-8 place-items-center rounded-full bg-primary text-xs font-semibold text-primary-foreground">
+                    {driver.avatar}
+                  </span>
+                  <div>
+                    <p className="font-semibold">{driver.name}</p>
+                    <p className="text-xs text-muted-foreground">{driver.phone}</p>
+                  </div>
+                </div>
+              ) : (
+                <p className="text-xs text-muted-foreground">No driver assigned</p>
+              )}
+            </div>
+
+            <div className="rounded-xl border border-border/80 p-3">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">Telemetry</p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Last stream {lastStreamAt.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", second: "2-digit" })}
+              </p>
+            </div>
+
+            <Button className="w-full">
+              <Truck className="mr-1 h-4 w-4" />
+              Open Vehicle Workspace
+            </Button>
+          </InspectorPanel>
+        ) : null}
+      </section>
     </div>
   );
 }

@@ -1,59 +1,102 @@
-﻿import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { useMemo, useState } from "react";
+import { Clock3, ThumbsDown, ThumbsUp } from "lucide-react";
 import { agentProposals } from "@/data/mock-data";
-import { ThumbsUp, ThumbsDown, Clock } from "lucide-react";
-import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { DataToolbar, FilterChipBar, InspectorPanel, PageHeader, StatusPill } from "@/components/product";
 
-const urgencyColors: Record<string, string> = {
-  critical: "bg-fleet-danger text-fleet-danger-foreground",
-  warning: "bg-fleet-warning text-fleet-warning-foreground",
-  info: "bg-fleet-info text-fleet-info-foreground",
-};
+const urgencyTone = {
+  critical: "danger",
+  warning: "warning",
+  info: "info",
+} as const;
+
+const filterOptions = ["all", "fuel", "maintenance", "route", "behavior", "compliance"] as const;
+
+type AgentFilter = (typeof filterOptions)[number];
 
 export default function AgentQueue() {
-  const [filter, setFilter] = useState<string>("all");
-  const filtered = filter === "all" ? agentProposals : agentProposals.filter(p => p.agentType === filter);
+  const [filter, setFilter] = useState<AgentFilter>("all");
+  const [search, setSearch] = useState("");
+  const [selectedId, setSelectedId] = useState<string>(agentProposals[0]?.id ?? "");
+
+  const filtered = useMemo(() => {
+    const pool = filter === "all" ? agentProposals : agentProposals.filter((proposal) => proposal.agentType === filter);
+    if (!search.trim()) return pool;
+    const q = search.toLowerCase();
+    return pool.filter((proposal) =>
+      [proposal.title, proposal.explanation, proposal.agentName]
+        .join(" ")
+        .toLowerCase()
+        .includes(q),
+    );
+  }, [filter, search]);
+
+  const selected = filtered.find((proposal) => proposal.id === selectedId) ?? filtered[0] ?? null;
 
   return (
-    <div className="page-shell p-6 space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Agent Proposal Queue</h1>
-        <p className="text-sm text-muted-foreground">{agentProposals.filter(p => p.status === "pending").length} pending proposals</p>
-      </div>
+    <div className="page-shell">
+      <PageHeader
+        eyebrow="Decision Workflow"
+        title="Agent Proposal Queue"
+        description="Triage AI recommendations by urgency, confidence, and operational impact."
+      />
 
-      <div className="flex gap-2 flex-wrap">
-        {["all", "fuel", "maintenance", "route", "behavior", "compliance"].map(t => (
-          <button key={t} onClick={() => setFilter(t)} className={`glass-filter-pill ${filter === t ? "glass-filter-pill-active" : "glass-filter-pill-idle"}`}>
-            {t === "all" ? "All" : t.charAt(0).toUpperCase() + t.slice(1)}
-          </button>
-        ))}
-      </div>
+      <FilterChipBar
+        items={filterOptions.map((entry) => ({
+          key: entry,
+          label: entry,
+          count: entry === "all" ? agentProposals.length : agentProposals.filter((item) => item.agentType === entry).length,
+        }))}
+        active={filter}
+        onChange={(value) => setFilter(value as AgentFilter)}
+      />
 
-      <div className="space-y-3">
-        {filtered.map(p => (
-          <div key={p.id} className="rounded-lg border p-4 flex gap-4 items-start">
-            <div className="flex-1 space-y-2">
-              <div className="flex items-center gap-2 flex-wrap">
-                <Badge variant="outline" className="text-[10px]">{p.agentName}</Badge>
-                <Badge className={`text-[10px] ${urgencyColors[p.urgency]}`}>{p.urgency}</Badge>
-                <span className="text-[10px] text-muted-foreground ml-auto">{new Date(p.timestamp).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}</span>
+      <DataToolbar value={search} onChange={setSearch} placeholder="Search proposals by title, reason, or agent" />
+
+      <section className="workspace-grid with-inspector">
+        <div className="space-y-3">
+          {filtered.map((proposal) => (
+            <button
+              type="button"
+              key={proposal.id}
+              onClick={() => setSelectedId(proposal.id)}
+              className={`surface-raised w-full rounded-2xl border p-4 text-left transition ${
+                selected?.id === proposal.id ? "border-primary/45" : ""
+              }`}
+            >
+              <div className="flex flex-wrap items-center gap-2">
+                <StatusPill label={proposal.urgency} tone={urgencyTone[proposal.urgency]} className="capitalize" />
+                <StatusPill label={proposal.agentType} tone="info" className="capitalize" />
+                <span className="ml-auto text-xs text-muted-foreground">
+                  {new Date(proposal.timestamp).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}
+                </span>
               </div>
-              <p className="text-sm font-medium">{p.title}</p>
-              <p className="text-xs text-muted-foreground leading-relaxed">{p.explanation}</p>
+              <p className="mt-2 text-sm font-semibold">{proposal.title}</p>
+              <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{proposal.explanation}</p>
+            </button>
+          ))}
+        </div>
+
+        {selected ? (
+          <InspectorPanel title={selected.title} subtitle={`${selected.agentName} | ${selected.confidence}% confidence`}>
+            <StatusPill label={selected.urgency} tone={urgencyTone[selected.urgency]} className="capitalize" />
+            <div className="surface-raised rounded-xl p-3 text-sm">
+              <p className="mb-2 text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">Explanation</p>
+              <p className="text-muted-foreground">{selected.explanation}</p>
             </div>
-            <div className="text-center shrink-0">
-              <div className="text-xl font-bold">{p.confidence}%</div>
-              <div className="text-[10px] text-muted-foreground">confidence</div>
-              <div className="flex gap-1 mt-2">
-                <Button size="sm" variant="default" className="h-7 text-xs"><ThumbsUp className="h-3 w-3" /></Button>
-                <Button size="sm" variant="outline" className="h-7 text-xs"><ThumbsDown className="h-3 w-3" /></Button>
-                <Button size="sm" variant="ghost" className="h-7 text-xs"><Clock className="h-3 w-3" /></Button>
-              </div>
+            <div className="surface-raised rounded-xl p-3 text-xs text-muted-foreground">
+              <p>Vehicle reference: {selected.vehicleId ?? "N/A"}</p>
+              <p>Driver reference: {selected.driverId ?? "N/A"}</p>
+              <p className="mt-2 flex items-center gap-1"><Clock3 className="h-3.5 w-3.5" /> Logged at {new Date(selected.timestamp).toLocaleString("en-GB")}</p>
             </div>
-          </div>
-        ))}
-      </div>
+            <div className="grid grid-cols-3 gap-2">
+              <Button size="sm"><ThumbsUp className="mr-1 h-3.5 w-3.5" />Approve</Button>
+              <Button size="sm" variant="outline"><ThumbsDown className="mr-1 h-3.5 w-3.5" />Reject</Button>
+              <Button size="sm" variant="secondary">Defer</Button>
+            </div>
+          </InspectorPanel>
+        ) : null}
+      </section>
     </div>
   );
 }
-

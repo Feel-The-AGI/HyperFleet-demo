@@ -1,11 +1,22 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { Button } from "@/components/ui/button";
 
 const Index = () => {
   return (
-    <div className="page-shell flex min-h-[calc(100vh-3.5rem)] items-center justify-center p-6">
-      <div className="panel-glass rounded-2xl border px-8 py-10 text-center max-w-xl">
-        <h1 className="mb-4 text-4xl font-bold tracking-tight">Welcome to HyperFleet</h1>
-        <p className="text-xl text-muted-foreground">Use the navigation to explore operations, management, intelligence, and reporting modules.</p>
+    <div className="page-shell flex min-h-[calc(100svh-4.25rem)] items-center justify-center">
+      <div className="surface-raised w-full max-w-2xl rounded-3xl p-10 text-center">
+        <p className="page-eyebrow">HyperFleet</p>
+        <h1 className="page-title mt-2">Emerald Operations Platform</h1>
+        <p className="page-subtitle mx-auto mt-3">
+          Use the left navigation to enter fleet map, dispatch controls, intelligence workflows, and reporting modules.
+        </p>
+        <div className="mt-6 flex justify-center gap-2">
+          <Button asChild>
+            <a href="/fleet-map">Open Fleet Map</a>
+          </Button>
+          <Button asChild variant="outline">
+            <a href="/trips">Open Trips</a>
+          </Button>
+        </div>
       </div>
     </div>
   );
