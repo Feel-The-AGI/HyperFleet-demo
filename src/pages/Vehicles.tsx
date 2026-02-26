@@ -1,10 +1,11 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Activity, Fuel, Gauge, Wrench } from "lucide-react";
 import { vehicles, getDriverById, maintenanceItems, type VehicleStatus } from "@/data/mock-data";
 import { DataToolbar, FilterChipBar, InspectorPanel, PageHeader, StatusPill } from "@/components/product";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 const statusTone: Record<VehicleStatus, "success" | "warning" | "danger" | "neutral"> = {
   moving: "success",
@@ -16,9 +17,27 @@ const statusTone: Record<VehicleStatus, "success" | "warning" | "danger" | "neut
 const statusOrder: Array<VehicleStatus | "all"> = ["all", "moving", "idle", "stopped", "offline"];
 
 export default function Vehicles() {
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [filter, setFilter] = useState<VehicleStatus | "all">("all");
   const [search, setSearch] = useState("");
   const [selectedId, setSelectedId] = useState<string>(vehicles[0]?.id ?? "");
+
+  useEffect(() => {
+    const requestedVehicleId = searchParams.get("vehicle");
+    if (!requestedVehicleId) return;
+
+    const exists = vehicles.some((vehicle) => vehicle.id === requestedVehicleId);
+    if (!exists) return;
+
+    setFilter("all");
+    setSearch("");
+    setSelectedId(requestedVehicleId);
+
+    const nextParams = new URLSearchParams(searchParams);
+    nextParams.delete("vehicle");
+    setSearchParams(nextParams, { replace: true });
+  }, [searchParams, setSearchParams]);
 
   const counts = useMemo(
     () => ({
@@ -176,7 +195,7 @@ export default function Vehicles() {
               )}
             </div>
 
-            <Button className="w-full">
+            <Button className="w-full" onClick={() => navigate(`/maintenance?vehicle=${selected.id}`)}>
               <Activity className="mr-1 h-4 w-4" />
               Open Vehicle Health View
             </Button>

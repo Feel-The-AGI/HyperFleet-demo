@@ -1,9 +1,10 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { CalendarClock, CircleCheck, Wrench } from "lucide-react";
 import { maintenanceItems, getVehicleById } from "@/data/mock-data";
 import { DataToolbar, FilterChipBar, InspectorPanel, PageHeader, StatusPill } from "@/components/product";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
+import { useSearchParams } from "react-router-dom";
 
 const filters = ["all", "overdue", "scheduled", "completed"] as const;
 type MaintenanceFilter = (typeof filters)[number];
@@ -15,9 +16,29 @@ const tone = {
 } as const;
 
 export default function MaintenancePage() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [filter, setFilter] = useState<MaintenanceFilter>("all");
   const [search, setSearch] = useState("");
   const [selectedId, setSelectedId] = useState<string>(maintenanceItems[0]?.id ?? "");
+
+  useEffect(() => {
+    const requestedVehicleId = searchParams.get("vehicle");
+    if (!requestedVehicleId) return;
+
+    const firstMatch = maintenanceItems.find((item) => item.vehicleId === requestedVehicleId);
+    const nextParams = new URLSearchParams(searchParams);
+    nextParams.delete("vehicle");
+
+    if (!firstMatch) {
+      setSearchParams(nextParams, { replace: true });
+      return;
+    }
+
+    setFilter("all");
+    setSearch("");
+    setSelectedId(firstMatch.id);
+    setSearchParams(nextParams, { replace: true });
+  }, [searchParams, setSearchParams]);
 
   const counts = useMemo(
     () => ({
